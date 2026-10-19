@@ -1894,6 +1894,7 @@ export default {
     "daylightModeDark": "Dark",
     "daylightModeSystem": "System",
     "stageTrackPillReposition": "Reposition song card",
+    "stageTrackPillResetPosition": "Reset position",
     "stageTrackPillPositioningHint": "Drag the card to move it. Arrow keys fine-tune.",
     "stageTrackPillMode": "When to show",
     "visualSettingsCardDesc": "Themes, lyric rendering modes, style entry points, and background opacity.",
