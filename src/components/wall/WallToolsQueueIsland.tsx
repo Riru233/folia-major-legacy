@@ -111,25 +111,177 @@ export function WallToolsQueueIsland({
   );
   const [announcement, setAnnouncement] = useState({ text: "", nonce: 0 });
 
-  // 行动作与按键处理读这里（身份稳定的 actions 对象，行不因为它重渲染）。
-  const latest = useRef({
-    playQueue,
-    host,
-    readOnly,
-    currentIndex,
-    currentSongKey,
-    playingSongKey,
-    t,
-  });
-  latest.current = {
-    playQueue,
-    host,
-    readOnly,
-    currentIndex,
-    currentSongKey,
-    playingSongKey,
-    t,
-  };
+    // 行动作与按键处理读这里（身份稳定的 actions 对象，行不因为它重渲染）。
+    const latest = useRef({ playQueue, host, readOnly, currentIndex, currentSongKey, playingSongKey, t });
+    latest.current = { playQueue, host, readOnly, currentIndex, currentSongKey, playingSongKey, t };
+
+    /** 第 index 行是不是正在播放（显示的那首或内部 currentSong）：这两行不能移除、不能「下一首播放」。 */
+    const isPlayingRow = useCallback((index: number) => {
+        const song = latest.current.playQueue[index];
+        if (!song) return false;
+        const key = getPlaybackSongKey(song);
+        return key === latest.current.currentSongKey || key === latest.current.playingSongKey;
+    }, []);
+
+    /** 播报一句（每次换一个子节点，同一句连说两次读屏也会再读）。 */
+    const announce = useCallback((text: string) => {
+        setAnnouncement(previous => ({ text, nonce: previous.nonce + 1 }));
+    }, []);
+
+    /** 把第 index 行滚进视口并把焦点放到它的主按钮上（那一行可能要等滚动后才挂载，最多再等两帧）。 */
+    const focusRow = useCallback((index: number) => {
+        const list = listRef.current;
+        if (!list || index < 0 || index >= latest.current.playQueue.length) return;
+        list.scrollToRow({ index, align: 'auto', behavior: 'instant' });
+        let attempts = 3;
+        const tryFocus = () => {
+            const button = list.element?.querySelector<HTMLButtonElement>(`[data-queue-index="${index}"] .lattice-tools-island-song`);
+            if (button) button.focus({ preventScroll: true });
+            else if (--attempts > 0) requestAnimationFrame(tryFocus);
+        };
+        requestAnimationFrame(tryFocus);
+    }, [listRef]);
+
+    const moveSong = useCallback((from: number, to: number) => {
+        const { host: currentHost, t: translate, readOnly: locked } = latest.current;
+        // 拖拽 / Alt+↑↓ 提交的这一刻再查一次：拖到一半外部舞台接管了播放，就不再改队列。
+        if (locked) return;
+        currentHost.moveQueueSong(from, to);
+        announce(translate('wallTools.queueMoved', { position: to + 1 }));
+    }, [announce]);
+
+    const keyAt = useCallback((index: number) => {
+        const song = latest.current.playQueue[index];
+        return song ? getPlaybackSongKey(song) : null;
+    }, []);
+
+    const reorder = useQueueDragReorder({
+        captureRef: frameRef,
+        getScrollElement: () => listRef.current?.element ?? null,
+        rowCount: playQueue.length,
+        keyAt,
+        onDrop: moveSong,
+    });
+    const { drag, beginDrag, ghostRef, cancel: cancelDrag, isDragging } = reorder;
+
+    /** 行上的按键：Enter 播放、↑↓ 移焦、Alt+↑↓ 挪一位、Delete 移除；用掉的都 preventDefault。 */
+    const handleRowKeyDown = useCallback((index: number, event: ReactKeyboardEvent<HTMLButtonElement>) => {
+        if (event.nativeEvent.isComposing || event.ctrlKey || event.metaKey) return;
+        const { playQueue: queue, host: currentHost, readOnly: locked } = latest.current;
+        const { key, altKey, shiftKey } = event;
+        if (key === 'Enter' && !altKey && !shiftKey) {
+            event.preventDefault();
+            const song = queue[index];
+            if (song) currentHost.playQueueSong(song);
+            return;
+        }
+        if ((key === 'ArrowUp' || key === 'ArrowDown') && !shiftKey) {
+            event.preventDefault();
+            const target = index + (key === 'ArrowUp' ? -1 : 1);
+            if (target < 0 || target >= queue.length) return;
+            if (altKey) {
+                if (locked) return;
+                moveSong(index, target);
+            }
+            focusRow(target);
+            return;
+        }
+        if (key === 'Delete') {
+            // 不管能不能删都消费掉（只读、当前行也一样），免得落到 bravais 的批量移除。
+            event.preventDefault();
+            if (altKey || shiftKey || locked || isPlayingRow(index)) return;
+            currentHost.removeQueueSong(index);
+            focusRow(Math.min(index, queue.length - 2));
+        }
+    }, [focusRow, isPlayingRow, moveSong]);
+
+    const actions = useMemo<QueueIslandRowActions>(() => ({
+        play: index => {
+            const song = latest.current.playQueue[index];
+            if (song) latest.current.host.playQueueSong(song);
+        },
+        playNext: index => {
+            if (!latest.current.readOnly && !isPlayingRow(index)) latest.current.host.playQueueSongNext(index);
+        },
+        moveToEnd: index => {
+            if (!latest.current.readOnly) latest.current.host.moveQueueSongToEnd(index);
+        },
+        remove: index => {
+            if (!latest.current.readOnly && !isPlayingRow(index)) latest.current.host.removeQueueSong(index);
+        },
+        keyDown: handleRowKeyDown,
+        beginDrag: (index, event) => {
+            if (!latest.current.readOnly) beginDrag(index, event);
+        },
+    }), [beginDrag, handleRowKeyDown, isPlayingRow]);
+
+    const labels = useMemo<QueueIslandRowProps['labels']>(() => ({
+        unavailable: t('status.songUnavailableTag'),
+        video: t('status.songVideoTag'),
+        playNext: t('queue.playNext'),
+        moveToEnd: t('queue.moveToEnd'),
+        remove: t('queue.remove'),
+        dragHandle: t('wallTools.queueDragHandle'),
+    }), [t]);
+
+    const rowProps = useMemo<QueueIslandRowProps>(
+        () => ({ playQueue, currentSongKey, playingSongKey, readOnly, drag, actions, labels }),
+        [actions, currentSongKey, drag, labels, playQueue, playingSongKey, readOnly],
+    );
+
+    useLayoutEffect(() => {
+        const frame = frameRef.current;
+        if (!frame) return undefined;
+        // 先同步量一次（layout 阶段，绘制前）：打开时的居中滚动用真实高度，而不是测量前按行数算的理想高度
+        // （窗口矮、浮岛被压缩时两者不同，居中会偏）。之后的变化交给 ResizeObserver。
+        const initialHeight = Math.round(frame.clientHeight);
+        setMeasuredListHeight(previous => (previous === initialHeight ? previous : initialHeight));
+        if (typeof ResizeObserver === 'undefined') return undefined;
+        const observer = new ResizeObserver(entries => {
+            const height = Math.round(entries[entries.length - 1].contentRect.height);
+            setMeasuredListHeight(previous => (previous === height ? previous : height));
+        });
+        observer.observe(frame);
+        return () => observer.disconnect();
+    }, []);
+
+    // 打开后、量到列表真实高度之后，等一帧（react-window 拿到自己的元素）再把当前歌曲滚到正中；只做一次。
+    const hasMeasured = measuredListHeight !== null;
+    const centeredRef = useRef(false);
+    useEffect(() => {
+        if (!hasMeasured || centeredRef.current) return undefined;
+        const frame = requestAnimationFrame(() => {
+            centeredRef.current = true;
+            const index = latest.current.currentIndex;
+            if (index >= 0) listRef.current?.scrollToRow({ index, align: 'center', behavior: 'instant' });
+        });
+        return () => cancelAnimationFrame(frame);
+    }, [hasMeasured, listRef]);
+
+    // 切歌：smart 平滑滚动（已经在视口里就不动）；拖拽中跳过。
+    const scrolledKeyRef = useRef(currentSongKey);
+    useEffect(() => {
+        if (scrolledKeyRef.current === currentSongKey) return;
+        scrolledKeyRef.current = currentSongKey;
+        if (currentIndex < 0 || isDragging()) return;
+        listRef.current?.scrollToRow({ index: currentIndex, align: 'smart', behavior: 'smooth' });
+    }, [currentIndex, currentSongKey, isDragging, listRef]);
+
+    // Esc：拖拽中只撤拖拽（捕获阶段，先于头部与面板的监听）。
+    const dragging = drag !== null;
+    useEffect(() => {
+        if (!dragging) return undefined;
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key !== 'Escape' || event.isComposing || !isDragging()) return;
+            cancelDrag();
+            event.preventDefault();
+        };
+        document.addEventListener('keydown', handleKeyDown, true);
+        return () => document.removeEventListener('keydown', handleKeyDown, true);
+    }, [cancelDrag, dragging, isDragging]);
+
+    const count = playQueue.length;
+    const ghostSong = drag ? playQueue[drag.from] : undefined;
 
   /** 第 index 行是不是正在播放（显示的那首或内部 currentSong）：这两行不能移除、不能「下一首播放」。 */
   const isPlayingRow = useCallback((index: number) => {
