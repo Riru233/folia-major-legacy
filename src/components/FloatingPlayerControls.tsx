@@ -31,6 +31,8 @@ import type {
 } from "./floating-player/playerControlSlotActions";
 import { usePlayerOverlayObstacle } from "../hooks/usePlayerOverlayLayout";
 import { useGlass } from "../shinoinject/useGlass.tsx";
+import HifiBadge from "./hifi/HifiBadge";
+import { useIsHifiRoute } from "./hifi/useHifiSignalPath";
 import { resolveLyricSeekMediaTime } from "../utils/lyrics/lyricSeekTime";
 
 export interface TrackNavigation {
@@ -620,6 +622,18 @@ const ExpandedView: React.FC<ExpandedViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const pinLabel = t(isPinned ? "options.playerBarUnpin" : "options.playerBarPin");
+  const isHifiRoute = useIsHifiRoute();
+  const progressBar = (
+    <ProgressBar
+      currentTime={currentTime}
+      duration={duration}
+      onSeek={onSeek}
+      primaryColor={primaryColor}
+      secondaryColor={secondaryColor}
+      trackColor={trackColor}
+      disabled={controlsDisabled}
+    />
+  );
   return (
     <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-x-4 gap-y-2 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
       {/* Desktop Layout - responsive grid positions apply from the sm breakpoint */}
@@ -725,16 +739,14 @@ const ExpandedView: React.FC<ExpandedViewProps> = ({
       </div>
 
       {/* Row 2: Current Time, Progress Bar, Duration */}
-      <div className="col-span-3 row-start-3 w-full px-2 sm:col-start-2 sm:col-span-1 sm:row-start-2">
-        <ProgressBar
-          currentTime={currentTime}
-          duration={duration}
-          onSeek={onSeek}
-          primaryColor={primaryColor}
-          secondaryColor={secondaryColor}
-          trackColor={trackColor}
-          disabled={controlsDisabled}
-        />
+      {/* HiFi 路线上时长后面多一块 HiFi 徽标；Web 路线和原来一模一样。 */}
+      <div className={`col-span-3 row-start-3 w-full px-2 sm:col-start-2 sm:col-span-1 sm:row-start-2${isHifiRoute ? " flex items-center gap-2" : ""}`}>
+        {isHifiRoute ? (
+          <>
+            <div className="min-w-0 flex-1">{progressBar}</div>
+            <HifiBadge isDaylight={isDaylight} disabled={controlsDisabled} />
+          </>
+        ) : progressBar}
       </div>
     </div>
   );
