@@ -12,9 +12,10 @@ import { icuFoliaDataPlugin } from '../icuFolia/icuFoliaDataPlugin.mjs';
 // It does not load the app's vite.config.ts: that file asks a web service for the commit's name
 // while it builds, and the rig makes no request beyond this machine. What the page needs of it is
 // repeated here: the React plugin, the command-palette pinyin module (the stores reach it), the
-// zh-TW virtual locale (src/i18n/config.ts imports it), the `@` alias, the build constants and the
-// separate three.js chunk. The PWA plugin is left out on purpose: a service worker would cache the
-// page between two builds of changed code.
+// zh-TW virtual locale (src/i18n/config.ts imports it) and the ICU 字典 virtual module the lyric
+// engines import, the `@` alias, the build constants and the separate three.js chunk. The PWA
+// plugin is left out on purpose: a service worker would cache the page between two builds of
+// changed code.
 //
 // The bundle is production React but NOT minified by default, so the function names in the
 // long-frame reports can be read. PERF_MINIFY=1 builds it minified like the shipped app.

@@ -68,6 +68,12 @@ const tick = async () => {
             process.kill(runnerPid, 0);
         }
         const text = await readAll();
+        // A listing that failed is no reading at all: nothing is printed for this tick, and the
+        // previous CPU snapshot stands, so the next tick's difference still covers the whole span.
+        // (A line with empty working sets would fail a window on "did not find the app's page
+        // process", and an empty snapshot would zero the next ownCpu while cpuTotal still counted
+        // the app's own use as outside load.)
+        if (text === null) return;
         const now = Date.now();
         const cpu = new Map();
         const rss = new Map();
@@ -95,7 +101,7 @@ const tick = async () => {
         for (const [pid, bytes] of rss) workingSet[String(pid)] = bytes;
         say({
             t: now,
-            cpuTotal: text === null ? null : Math.round(Math.min(100, Math.max(0, machineSum / logicalProcessors)) * 100) / 100,
+            cpuTotal: Math.round(Math.min(100, Math.max(0, machineSum / logicalProcessors)) * 100) / 100,
             cpuTotalApproximate: true,
             cores: null,
             ownCpu,

@@ -77,7 +77,9 @@ const MIN_WINDOW_SAMPLES = 6;
 const SAMPLER_SETTLE_MS = SAMPLER_SETTLE_SECONDS * 1000;
 
 const parseArgs = (argv) => {
-    const args = { profile: 'laptop', windows: PLAY.windowsPerLoad };
+    // laptop is the Windows default; macOS has only host (resolveProfile in rig.mjs refuses the
+    // others), so a plain `node dev/perf/run.mjs --only ...` there works without typing --profile.
+    const args = { profile: process.platform === 'darwin' ? 'host' : 'laptop', windows: PLAY.windowsPerLoad };
     for (let index = 0; index < argv.length; index += 1) {
         const name = argv[index];
         if (!name.startsWith('--')) {
@@ -632,7 +634,7 @@ const checkSession = async (session, folder) => {
             p50Ms: median(gaps),
             p95Ms: percentile(gaps, 0.95),
             worstMs: Math.max(...gaps),
-            ...(session.gpuCounters
+            ...(session.gpuCounters()
                 ? { gpuPercent: mean(emptySamples.map(sample => sumOf(sample.gpu))) }
                 : {}),
         },
@@ -769,7 +771,8 @@ const notReadyNow = async () => {
     // One launch without limits, only to see what rate the empty window is paced at.
     const first = await openSession('host', VIEWPORT);
     await first.close();
-    log(`right now: other programs use ${(outside.ofAllProcessors * 100).toFixed(0)}% of all processors and ${outside.gpuPercent.toFixed(0)}% of the graphics card's 3D engine; the empty window makes ${first.emptyFrameRate.toFixed(0)} frames a second, the screen refreshes ${first.profile.screenRefreshRate ?? '?'} times`);
+    const gpuNow = outside.gpuPercent === undefined ? '' : ` and ${outside.gpuPercent.toFixed(0)}% of the graphics card's 3D engine`;
+    log(`right now: other programs use ${(outside.ofAllProcessors * 100).toFixed(0)}% of all processors${gpuNow}; the empty window makes ${first.emptyFrameRate.toFixed(0)} frames a second, the screen refreshes ${first.profile.screenRefreshRate ?? '?'} times`);
     const reasons = [];
     if (outside.brokenLimits.length) {
         reasons.push(`other programs keep busy: ${outside.brokenLimits.join(', ')}`);
@@ -834,10 +837,19 @@ const main = async () => {
 
     if (args.baseline || args.plan) {
         const plan = baselinePlan(options.windows);
-        log(`baseline: ${plan.all.length} scenarios under laptop and old, ${plan.core.length} under host, 10 again at the large viewport, noise and truth checks; every scenario in a launch of its own`);
-        log(`this takes about ${plan.minutes} minutes; longer when windows have to be repeated`);
+        if (process.platform === 'darwin') {
+            log(`baseline on macOS: all ${plan.all.length} scenarios under host (laptop and old are Windows' profiles), the ten heaviest again at the large viewport, noise and truth checks; every scenario in a launch of its own. The Windows figure of about ${plan.minutes} minutes is for two profiles and a core pass besides; a host-only run is shorter by roughly a pass and a half.`);
+        } else {
+            log(`baseline: ${plan.all.length} scenarios under laptop and old, ${plan.core.length} under host, 10 again at the large viewport, noise and truth checks; every scenario in a launch of its own`);
+            log(`this takes about ${plan.minutes} minutes; longer when windows have to be repeated`);
+        }
     }
     if (args.plan) {
+        if (process.platform === 'darwin') {
+            // The table is written for Windows' counters (report.mjs); the macOS results are the JSON.
+            log('on macOS there is no 画面底数 table to write: run the baseline and read the JSON under claude-notes/perf/data/');
+            return;
+        }
         const table = path.join(notesDir(), '画面底数.md');
         if (fs.existsSync(path.join(notesDir(), 'data', 'baseline'))) {
             log(`a baseline exists already; ${table} left as it is`);

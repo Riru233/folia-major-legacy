@@ -270,6 +270,8 @@ export const resolveProfile = (name) => {
             affinityMask: null,
             samplerMask: null,
             hasSlowCores: false,
+            /** macOS reads no graphics-card counters (darwin.mjs): nothing averages the zeros in. */
+            gpuCounters: false,
             cpuName: topologyAsked.name,
             logicalProcessors: topologyAsked.logicalProcessors,
             slowProcessors: [],
@@ -316,15 +318,18 @@ export const resolveProfile = (name) => {
 /**
  * What other programs did over some of the sampler's lines, and which of the limits in OUTSIDE_LOAD
  * (scenarios.mjs) that broke. Shared by dev/perf/run.mjs and dev/perf/app/run.mjs.
+ *
+ * `profile.gpuCounters === false` (macOS, darwin.mjs) leaves the graphics-card numbers out instead
+ * of averaging the sampler's zeros into them, and the card's limit cannot break.
  */
 export const outsideLoad = (samples, profile) => {
     const held = profile.heldProcessors;
+    const gpuCounters = profile.gpuCounters !== false;
     const withOwn = samples.filter(sample => typeof sample.ownCpu === 'number');
     const ofAllProcessors = mean(withOwn.map(sample => Math.max(0, sample.cpuTotal / 100 - sample.ownCpu / profile.logicalProcessors)));
     const ofHeldProcessors = held
         ? mean(withOwn.map(sample => Math.max(0, held.reduce((sum, index) => sum + Number(sample.cores?.[index] ?? 0) / 100, 0) - sample.ownCpu) / held.length))
         : null;
-    const gpuPercent = mean(samples.map(sample => Number(sample.gpuOutside ?? 0)));
     const brokenLimits = [];
     if (ofAllProcessors > OUTSIDE_LOAD.ofAllProcessors) {
         brokenLimits.push('processors');
@@ -332,14 +337,16 @@ export const outsideLoad = (samples, profile) => {
     if (ofHeldProcessors !== null && ofHeldProcessors > OUTSIDE_LOAD.ofHeldProcessors) {
         brokenLimits.push('held processors');
     }
-    if (gpuPercent > OUTSIDE_LOAD.gpuPercent) {
+    if (gpuCounters && mean(samples.map(sample => Number(sample.gpuOutside ?? 0))) > OUTSIDE_LOAD.gpuPercent) {
         brokenLimits.push('graphics card');
     }
     return {
         ofAllProcessors,
         ...(ofHeldProcessors === null ? {} : { ofHeldProcessors }),
-        gpuPercent,
-        videoMemoryMb: mean(samples.map(sample => Number(sample.videoMemoryOutside ?? 0))) / (1024 * 1024),
+        ...(gpuCounters ? {
+            gpuPercent: mean(samples.map(sample => Number(sample.gpuOutside ?? 0))),
+            videoMemoryMb: mean(samples.map(sample => Number(sample.videoMemoryOutside ?? 0))) / (1024 * 1024),
+        } : {}),
         brokenLimits,
     };
 };

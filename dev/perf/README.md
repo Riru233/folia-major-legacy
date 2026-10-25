@@ -205,7 +205,6 @@ lock are the same files; only the platform layer is another one. What differs, h
 | whole-machine CPU | counter, instant | sum of ps' per-process decaying averages (see `darwinSampler.mjs`), an approximation, flagged `cpuTotalApproximate` in every line |
 | screen refresh rate | video controller's mode | null - system_profiler does not tell it for the built-in display; the "follows the screen" check is off, every launch still records its `emptyFrameRate` |
 | screen kept on | `win.ps1 -Action awake` | `caffeinate -u -d -w <runner>` (same contract: turns an off screen on, ends with the runner) |
-| private bytes | asked per process | `footprint` of one pid, on demand (`darwinPrivateBytes`); not in the per-second sampler |
 
 `--baseline` on macOS runs everything under `host` (the large-viewport pass picks by main-thread
 time, the GPU share not existing there), so its numbers compare with an Apple Silicon machine's
@@ -214,7 +213,8 @@ report.mjs's table is built around Windows' GPU columns. Per-frame main-thread t
 percentiles, long frames, per-process CPU and working sets are measured exactly as on Windows.
 
 Run it the same way, from the repository root: `node dev/perf/run.mjs --profile host --set core
---label <name>`. `shots.mjs` (the looks-the-same tool) is not ported: its engine and clock go
+--label <name>` (`host` is the default profile there, so the flag can be left off).
+`shots.mjs` (the looks-the-same tool) is not ported: its engine and clock go
 through the same rig, but nothing of it has been tried on macOS.
 
 ## The files

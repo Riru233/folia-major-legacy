@@ -118,26 +118,20 @@ export const darwinProcessTree = (rootPid) => {
         if (match) rows.push({ pid: Number(match[1]), ppid: Number(match[2]), name: match[3].trim() });
     }
     const byParent = new Map();
+    const byPid = new Map();
     for (const row of rows) {
+        byPid.set(row.pid, row);
         byParent.set(row.ppid, [...(byParent.get(row.ppid) ?? []), row]);
     }
-    const tree = [];
-    const walk = (pid, kind) => {
+    // The root itself first (win.ps1 lists it too), then everything below it.
+    const root = byPid.get(rootPid);
+    const tree = root ? [{ pid: root.pid, kind: 'root', name: path.basename(root.name), affinity: null }] : [];
+    const walk = (pid) => {
         for (const row of byParent.get(pid) ?? []) {
-            tree.push({ pid: row.pid, kind: kind ?? 'process', name: path.basename(row.name), affinity: null });
-            walk(row.pid, 'process');
+            tree.push({ pid: row.pid, kind: 'process', name: path.basename(row.name), affinity: null });
+            walk(row.pid);
         }
     };
-    walk(rootPid, 'root');
+    walk(rootPid);
     return tree;
-};
-
-/** A private-memory reading of one process, for points a series reads once; null on failure. */
-export const darwinPrivateBytes = (pid) => {
-    const result = spawnSync('footprint', [String(pid)], { encoding: 'utf8', timeout: 30_000 });
-    const text = result.status === 0 ? result.stdout : '';
-    const footprint = /Footprint:\s*([\d.]+)\s*([KMGT]?)B/.exec(text);
-    if (!footprint) return null;
-    const unit = { '': 1, K: 1024, M: 1024 ** 2, G: 1024 ** 3, T: 1024 ** 4 }[footprint[2]] ?? 1;
-    return Math.round(Number(footprint[1]) * unit);
 };
