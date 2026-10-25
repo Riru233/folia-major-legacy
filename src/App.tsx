@@ -91,6 +91,7 @@ import { seekHifiRoute } from './components/hifi/hifiRouteTransport';
 import { useHifiAutomixGate } from './components/hifi/useHifiAutomixGate';
 import { useWebEngineYield } from './components/hifi/useWebEngineYield';
 import { useHifiMediaSessionKeepAlive } from './components/hifi/useHifiMediaSessionKeepAlive';
+import { useHifiWebRouteNotice } from './components/hifi/useHifiWebRouteNotice';
 import { isHifiRoute, useHifiTrackStore } from './services/hifi/hifiPlayback';
 import { hifiEngine } from './services/hifi/hifiEngine';
 import { selectHifiEngineConfig, useHifiSettingsStore } from './stores/useHifiSettingsStore';
@@ -1441,6 +1442,7 @@ export default function App() {
         isNowPlayingControlDisabledRef,
     });
     useHifiMediaSessionKeepAlive();
+    useHifiWebRouteNotice();
 
     const {
         exportState,
