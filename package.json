@@ -208,6 +208,12 @@
       ],
       "include": "build/installer.nsh"
     },
+    "rpm": {
+      "fpm": [
+        "--rpm-rpmbuild-define",
+        "_build_id_links none"
+      ]
+    },
     "linux": {
       "artifactName": "${name}-${version}-linux-${arch}.${ext}",
       "target": [
