@@ -26,8 +26,10 @@ export const ROOT = path.resolve(HERE, '../..');
 export const ELECTRON_DARWIN = path.join(ROOT, 'node_modules', 'electron', 'dist', 'Electron.app', 'Contents', 'MacOS', 'Electron');
 const SAMPLER = path.join(HERE, 'darwinSampler.mjs');
 
+// LC_ALL=C: ps, sysctl and system_profiler print numbers the C locale's way, the one the patterns
+// here read (a comma-decimal locale would otherwise write `1,5`).
 const run = (file, args) => {
-    const result = spawnSync(file, args, { encoding: 'utf8', timeout: 20_000 });
+    const result = spawnSync(file, args, { encoding: 'utf8', timeout: 20_000, env: { ...process.env, LC_ALL: 'C' } });
     return result.status === 0 ? result.stdout : null;
 };
 

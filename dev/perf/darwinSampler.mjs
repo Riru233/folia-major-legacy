@@ -48,7 +48,9 @@ const psTimeSeconds = (text) => {
 
 /** One `ps` listing of every process: pid, cumulative CPU time, resident KB, ps' own cpu average. */
 const readAll = () => new Promise((resolve) => {
-    execFile('ps', ['-A', '-o', 'pid=,time=,rss=,pcpu='], { timeout: 8000 }, (error, stdout) => {
+    // LC_ALL=C: a comma-decimal locale prints `time` and `pcpu` as `0:01,50` / `1,5`, which the
+    // line pattern in tick does not read.
+    execFile('ps', ['-A', '-o', 'pid=,time=,rss=,pcpu='], { timeout: 8000, env: { ...process.env, LC_ALL: 'C' } }, (error, stdout) => {
         resolve(error ? null : stdout);
     });
 });
@@ -62,11 +64,20 @@ let stopped = false;
 
 const tick = async () => {
     if (stopped) return;
-    try {
-        if (runnerPid > 0) {
+    if (runnerPid > 0) {
+        try {
             // Signal 0 only asks whether the runner is there; EPERM means it is (another user's).
             process.kill(runnerPid, 0);
+        } catch (error) {
+            // The runner is gone (ESRCH): stop without another line, as win.ps1 does. EPERM (or
+            // anything else) is still a live runner, and the tick goes on.
+            if (error?.code === 'ESRCH') {
+                stopped = true;
+                process.exit(0);
+            }
         }
+    }
+    try {
         const text = await readAll();
         // A listing that failed is no reading at all: nothing is printed for this tick, and the
         // previous CPU snapshot stands, so the next tick's difference still covers the whole span.
@@ -78,7 +89,7 @@ const tick = async () => {
         const cpu = new Map();
         const rss = new Map();
         let machineSum = 0;
-        for (const line of (text ?? '').split('\n')) {
+        for (const line of text.split('\n')) {
             const match = /^\s*(\d+)\s+(\S+)\s+(\d+)\s+([\d.]+)$/.exec(line);
             if (!match) continue;
             const pid = Number(match[1]);
@@ -112,12 +123,8 @@ const tick = async () => {
             videoMemoryOutside: 0,
             workingSet,
         });
-    } catch (error) {
-        // The runner is gone (ESRCH): stop without another line, as win.ps1 does.
-        if (error?.code === 'ESRCH') {
-            stopped = true;
-            process.exit(0);
-        }
+    } catch {
+        // A tick that failed prints nothing; the next one reads again.
     }
 };
 
