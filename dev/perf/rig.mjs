@@ -551,7 +551,11 @@ export const launchEngine = async ({ width, height, deviceScale, affinityMask = 
     }
 };
 
-/** Stops a whole process tree the platform's way, for an engine that cannot be closed politely. */
+/**
+ * Stops an engine that cannot be closed politely. On Windows `taskkill /t /f` kills the whole
+ * process tree; on macOS only the root gets SIGKILL, and Electron's helpers are expected to exit
+ * with it.
+ */
 const killTree = (platform, pid) => {
     if (!pid) return;
     if (platform === 'win32') {

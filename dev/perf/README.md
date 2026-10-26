@@ -226,8 +226,9 @@ through the same rig, but nothing of it has been tried on macOS.
 | `page.html`, `page.tsx`, `stage.tsx` | the measuring page |
 | `vite.config.ts` | builds the page as a production bundle of its own (`dev/perf/.build/dist`), and for the pictures once more in one file (`dist-shots`) |
 | `shell.cjs` | the Electron main script: one window nobody sees |
-| `rig.mjs` | build, serve, launch, DevTools protocol, Windows helper: shared by the two tools |
+| `rig.mjs` | build, serve, launch, DevTools protocol, Windows / macOS helpers: shared by the two tools |
 | `win.ps1` | processor layout, process tree with affinities, the per-second counter sampler |
+| `darwin.mjs`, `darwinSampler.mjs` | the macOS side: machine description, process tree, stray engines, keeping the display on, and the per-second `ps` sampler (no GPU counters) |
 | `run.mjs`, `report.mjs` | the runner and the table writer |
 | `shots.mjs`, `clock.js` | the looks-the-same tool, and the script it puts into the page to take it off real time |
 

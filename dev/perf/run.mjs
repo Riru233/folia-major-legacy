@@ -281,8 +281,9 @@ const openSession = async (profileName, viewport) => {
             }
             return tree;
         },
-        /** The sampler follows the app's processes; it is started again when one of them was replaced, and when it has ended. */
+        /** Whether the sampler reads GPU counters (win.ps1 does, darwinSampler.mjs does not); before one runs, the platform's answer. */
         gpuCounters: () => (sampler ? sampler.gpuCounters() : process.platform !== 'darwin'),
+        /** The sampler follows the app's processes; it is started again when one of them was replaced, and when it has ended. */
         ensureSampler: async () => {
             const processes = await engine.processes();
             const pids = processes.map(process => process.id).sort((left, right) => left - right);

@@ -108,8 +108,11 @@ export const keepDarwinAwake = () => {
 };
 
 /**
- * Every process below `rootPid` (itself included), as win.ps1 -Action tree lists them. macOS has
- * no affinity masks to report; `affinity` is null and the rig checks none under the host profile.
+ * Every process below `rootPid` (itself included), in a reduced form of win.ps1 -Action tree's
+ * entries: only `pid`, `name`, `kind` and `affinity`. `kind` is 'root' for `rootPid` and 'process'
+ * for the rest, not the command line's --type (browser / renderer / gpu-process ...); there is no
+ * `parent` or `workingSetMb`; and macOS has no affinity masks to report, so `affinity` is null and
+ * the rig checks none under the host profile.
  */
 export const darwinProcessTree = (rootPid) => {
     const text = run('ps', ['-A', '-o', 'pid=,ppid=,comm=']);
