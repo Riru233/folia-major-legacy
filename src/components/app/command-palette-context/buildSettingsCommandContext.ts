@@ -227,6 +227,9 @@ export const buildSettingsCommandContext = (
         toggleRemoteControlExpandCover: () => desktop.handleToggleRemoteControlExpandCover(
             !useDesktopSettingsStore.getState().remoteControlExpandCover,
         ),
+        toggleRemoteControlTextShade: () => desktop.handleToggleRemoteControlTextShade(
+            !useDesktopSettingsStore.getState().remoteControlTextShade,
+        ),
         unlockRemoteControl: () => desktop.handleToggleRemoteControlClickThrough(false),
         toggleObsKeepMainWindowAnimation: () => useStageSettingsStore.getState().handleToggleObsKeepMainWindowAnimation(
             !useStageSettingsStore.getState().obsKeepMainWindowAnimation,
