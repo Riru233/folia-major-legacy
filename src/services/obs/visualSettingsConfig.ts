@@ -9,6 +9,7 @@ import { useThemeSettingsStore } from '../../stores/useThemeSettingsStore';
 import { useStageSettingsStore } from '../../stores/useStageSettingsStore';
 import { useLibraryWallLookStore } from '../../stores/useLibraryWallLookStore';
 import { useLiquidGlassSettingsStore } from '../../stores/useLiquidGlassSettingsStore';
+import { usePlayerChromeSettingsStore } from '../../stores/usePlayerChromeSettingsStore';
 
 // src/services/obs/visualSettingsConfig.ts
 // Everything compressConfig serializes except the theme. Reads the live settings store, so both
@@ -127,6 +128,9 @@ export function buildVisualSettingsConfig(): Record<string, unknown> {
       light: storeLiquidGlass.light,
       jelly: storeLiquidGlass.jelly,
     },
+    // The frosted bar behind the player page's titlebar: a look of the player page, no user exception.
+    // The OBS overlay draws no titlebar and ignores it; it rides along so a copied look keeps it.
+    playerHeaderBlur: usePlayerChromeSettingsStore.getState().playerHeaderBlur,
   };
 }
 

@@ -154,6 +154,9 @@ const FIELD_GROUPS: Record<string, ImportGroup> = {
 
     // 流体玻璃的三个全局参数：一套玻璃的调参，和别的分组没有从属关系，单独成组。
     liquidGlass: 'liquidGlass',
+    // The frosted bar behind the player page's titlebar. Under visualizer with the other player-page
+    // switch that travels (hidePlayerTranslationSubtitle): it is part of how the playing screen looks.
+    playerHeaderBlur: 'visualizer',
 };
 
 // Fields the import applies only when the incoming value is truthy, so an incoming null means "the

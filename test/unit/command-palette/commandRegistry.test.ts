@@ -150,6 +150,7 @@ const createContext = (overrides: CommandPaletteContextOverrides = {}): CommandP
             togglePlaybackFade: vi.fn(),
             toggleAutoSkipUnplayable: vi.fn(),
             toggleAlwaysShowMainWindowTitlebar: vi.fn(),
+            togglePlayerHeaderBlur: vi.fn(),
             toggleHideFullscreenButton: vi.fn(),
             toggleNativeMacFullscreenButton: vi.fn(),
             toggleAutoHideCursorWithPlayerChrome: vi.fn(),
