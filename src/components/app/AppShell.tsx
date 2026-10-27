@@ -175,15 +175,23 @@ const AppShell: React.FC<AppShellProps> = ({
   const isTitlebarBackdropVisible =
     isTitlebarRevealed ||
     (showsPlayerHeaderBlur && alwaysShowMainWindowTitlebar);
-  const titlebarBackdropClassName = `absolute inset-0 ${
-    isDaylight
-      ? isPlayerView
-        ? "bg-gradient-to-b from-[#f5f5f5aa] to-[#0000]"
-        : "bg-gradient-to-b from-[#f5f5f5aa] to-[#0000]"
-      : isPlayerView
-        ? "bg-gradient-to-b from-[#000a] to-[#0000]"
-        : ""
-  }`;
+  // 开了顶栏模糊时用更实的一层：0.18 的白在深色画面上只会混成深灰，浅色主题的深色按钮照样看不清，
+  // 得把底色抬到接近浅色主题的底；深色主题同理压暗。透明窗口原有的渐变样式不变。
+  const titlebarBackdropClassName = showsPlayerHeaderBlur
+    ? `absolute inset-0 backdrop-blur-md border-b ${
+        isDaylight
+          ? "bg-white/65 border-black/5 shadow-[0_8px_28px_rgba(0,0,0,0.06)]"
+          : "bg-black/40 border-white/10 shadow-[0_8px_28px_rgba(0,0,0,0.20)]"
+      }`
+    : `absolute inset-0 ${
+        isDaylight
+          ? isPlayerView
+            ? "bg-gradient-to-b from-[#f5f5f5aa] to-[#0000]"
+            : "bg-gradient-to-b from-[#f5f5f5aa] to-[#0000]"
+          : isPlayerView
+            ? "bg-gradient-to-b from-[#000a] to-[#0000]"
+            : ""
+      }`;
 
   return (
     <div
