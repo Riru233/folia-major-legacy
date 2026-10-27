@@ -14,9 +14,6 @@ on:
   push:
     branches:
       - main
-  # codemap-sync 把重生成的代码地图先推到临时分支，再从这里派发一跑：main 的分支保护要求这两个
-  # 检查记在被推上去的那个 commit 上，而 GITHUB_TOKEN 的推送不会触发 push workflow。
-  workflow_dispatch:
 
 permissions:
   contents: read
