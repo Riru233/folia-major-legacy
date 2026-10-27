@@ -3466,6 +3466,33 @@ export default {
         "description": "When signed in, your own private playlists now load their songs, with real paging. Self-hosted backends must run qq-music-api 3.1.2 or later; older backends fall back automatically, and a playlist that cannot be read now says it is not public instead of silently showing as empty."
       }
     },
+    "v0_7_23": {
+      "intro": "Welcome to 0.7.23. The desktop app adds an mpv playback engine that sends local and Navidrome songs to your output device as they are; ReplayGain gains Smart balance, which adjusts by measured loudness; lyric filtering becomes a list of rules; Tempera gets a new drum effect, Sumizome Depth; and the interface is now available in Vietnamese.",
+      "hifi": {
+        "title": "HiFi Bit-Perfect Playback",
+        "description": "Desktop gains a Playback engine choice at the top of Settings → Playback: local files and Navidrome can switch to mpv, which sends audio to the output device in the source file's own format, with exclusive mode on Windows and macOS and gapless transitions when the next song also plays through mpv. On Windows and macOS mpv downloads in one click (falling back to a mirror when GitHub is unreachable, with cloud-drive links for manual download); Linux uses the mpv installed on the system. A badge beside the progress bar and the signal path panel show whether a song is bit-perfect and which conversions happen on the way. With mpv, these songs skip the equalizer, audio effects, ReplayGain, fades, smart transitions, the spectrum and lyric video export; online songs always use Web Audio."
+      },
+      "smartBalance": {
+        "title": "Smart Volume Balance",
+        "description": "ReplayGain gains a Smart mode: it measures each song's loudness, turns loud songs down and lifts quiet ones as far as they can go without clipping, with no gain tags needed in the files. It learns as songs play and adjusts at most once per play; what it measures is stored separately and can be cleared under Smart Balance Data on the Storage page."
+      },
+      "lyricFilter": {
+        "title": "Lyric Filtering Rules",
+        "description": "Lyric filtering is now a list of rules: starts with, contains, whole line, ends with, word list and expression. While editing you can see which lines each rule removes from this song and from songs you've played; hand-written expressions are tried in the background first, and one that runs too long won't take effect. Old filter settings convert automatically, and closing the window with unsaved changes asks first."
+      },
+      "temperaInk": {
+        "title": "Tempera: Sumizome Depth",
+        "description": "Tempera's Smart beat mode adds Sumizome Depth: on every kick and snare, a blot of ink in the theme color blooms across the scene, leaving a faint stain on the paper between hits. The scene also gains depth: the watermark and back images sit behind with a light blur, echo lyrics and front images float in front, near and far layers move at different speeds as the camera pans, and lyrics take their depth from their size. Depth of field, camera pan and lyric depth each have a strength slider in the style settings."
+      },
+      "vietnamese": {
+        "title": "Vietnamese Interface",
+        "description": "The interface is now available in Vietnamese (Tiếng Việt), translated by a community contributor; switch to it in the language setting or the command palette. Follow system now picks the current system language on every launch, so a change of system language applies the next time you start Folia, and the macOS app no longer shows English on a Chinese system."
+      },
+      "moreDetails": {
+        "title": "More Improvements",
+        "description": "When signed in to YouTube Music, official music videos in lists show and play as the official audio versions, and videos without a match are marked MV. The song card on the player page can be dragged to a new position. Local folders, albums and playlists can have a fixed custom cover: a poster.png in the folder, an uploaded image, or the cover of one of their songs. Lyric style and theme park previews can switch to Live to show the song that's playing. Desktop adds a Blurred Player Header setting (off by default); the remote control window remembers where you left it, and the text shade on its transparent background is now optional. QQ Music playlists no longer resync every time you open them, and the Linux RPM package no longer conflicts with other Electron apps."
+      }
+    },
     "v0_7_22": {
       "intro": "This is the 0.7.22 Beta build, released early so everyone can try 0.7.22 ahead of the official release — the whole player looks clear and translucent.",
       "glassUpgrade": {

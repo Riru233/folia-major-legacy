@@ -3434,6 +3434,33 @@ export default {
         "description": "Sau khi đăng nhập, danh sách phát riêng tư của bạn nay có thể tải bài hát với phân trang thực tế. Máy chủ tự lưu trữ cần chạy qq-music-api 3.1.2 trở lên; phiên bản cũ hơn sẽ tự động quay về cơ chế dự phòng, và danh sách phát không đọc được sẽ báo rõ là danh sách không công khai thay vì hiển thị trống."
       }
     },
+    "v0_7_23": {
+      "intro": "Chào mừng bạn đến với phiên bản 0.7.23. Bản máy tính bổ sung công cụ phát mpv, đưa bài hát cục bộ và Navidrome tới thiết bị đầu ra nguyên vẹn như tệp gốc; ReplayGain có thêm chế độ Thông minh điều chỉnh theo độ lớn âm thanh đo được; bộ lọc lời bài hát chuyển thành danh sách quy tắc; Tempera có thêm hiệu ứng trống mới Chiều sâu Sumizome; và giao diện nay đã có tiếng Việt.",
+      "hifi": {
+        "title": "Phát HiFi nguyên bản (bit-perfect)",
+        "description": "Bản máy tính có thêm lựa chọn Công cụ phát ở đầu mục Cài đặt → Điều khiển phát: tệp cục bộ và Navidrome có thể chuyển sang mpv, gửi âm thanh tới thiết bị đầu ra theo đúng định dạng của tệp gốc, hỗ trợ chế độ độc quyền trên Windows và macOS, và chuyển bài liền mạch khi bài tiếp theo cũng phát qua mpv. Trên Windows và macOS có thể tải mpv bằng một cú nhấp (tự chuyển sang máy chủ phản chiếu khi không kết nối được GitHub, kèm liên kết lưu trữ đám mây để tải thủ công); Linux dùng mpv đã cài trên hệ thống. Huy hiệu cạnh thanh tiến trình và bảng đường tín hiệu cho biết bài đang phát có nguyên bản hay không và đã qua những bước chuyển đổi nào. Khi dùng mpv, các bài này bỏ qua bộ cân bằng, hiệu ứng âm thanh, ReplayGain, chuyển âm mờ dần, chuyển bài thông minh, phổ tần và xuất video lời bài hát; bài hát trực tuyến luôn dùng Web Audio."
+      },
+      "smartBalance": {
+        "title": "Cân bằng âm lượng thông minh",
+        "description": "ReplayGain có thêm chế độ Thông minh: đo độ lớn âm thanh của từng bài, giảm bài quá to và tăng bài nhỏ trong giới hạn không bị méo tiếng, không cần tệp có sẵn thẻ gain. Chế độ này học dần trong khi phát và điều chỉnh tối đa một lần mỗi lượt phát; dữ liệu đo được lưu riêng và có thể xóa trong mục Dữ liệu cân bằng thông minh ở trang Lưu trữ."
+      },
+      "lyricFilter": {
+        "title": "Quy tắc lọc lời bài hát",
+        "description": "Bộ lọc lời bài hát nay là danh sách quy tắc: bắt đầu bằng, chứa, nguyên dòng, kết thúc bằng, danh sách từ và biểu thức. Khi chỉnh sửa, bạn có thể thấy mỗi quy tắc xóa những dòng nào trong bài này và các bài đã nghe; biểu thức tự viết sẽ được chạy thử ở nền trước, biểu thức chạy quá lâu sẽ không có hiệu lực. Cài đặt lọc cũ được chuyển đổi tự động, và khi đóng cửa sổ còn thay đổi chưa lưu sẽ có lời nhắc."
+      },
+      "temperaInk": {
+        "title": "Tempera: Chiều sâu Sumizome",
+        "description": "Chế độ Nhịp thông minh của Tempera có thêm Chiều sâu Sumizome: mỗi tiếng trống kick và snare, một vệt mực màu chủ đề loang ra trên khung hình, để lại vết mực mờ trên mặt giấy giữa các nhịp. Khung hình cũng có thêm chiều sâu: hình mờ và ảnh phía sau lùi ra sau với chút nhòe, lời vọng và ảnh phía trước nổi lên trên, các lớp gần xa chuyển động với tốc độ khác nhau khi ống kính lia, và lời bài hát có độ xa gần theo kích thước. Độ sâu trường ảnh, lia ống kính và độ xa gần của lời đều có thanh chỉnh cường độ riêng trong cài đặt phong cách."
+      },
+      "vietnamese": {
+        "title": "Giao diện tiếng Việt",
+        "description": "Giao diện nay đã có tiếng Việt, do thành viên cộng đồng dịch; chuyển đổi trong cài đặt ngôn ngữ hoặc bảng lệnh. Tùy chọn Theo hệ thống nay chọn theo ngôn ngữ hệ thống hiện tại mỗi lần khởi động, nên khi đổi ngôn ngữ hệ thống, lần khởi động sau Folia sẽ đổi theo; bản macOS không còn hiển thị tiếng Anh trên hệ thống tiếng Trung."
+      },
+      "moreDetails": {
+        "title": "Thêm nhiều cải tiến",
+        "description": "Khi đăng nhập YouTube Music, MV chính thức trong danh sách được hiển thị và phát dưới dạng bản âm thanh chính thức, video không ghép được sẽ được đánh dấu MV. Thẻ bài hát trên trang phát có thể kéo sang vị trí mới. Thư mục, album và danh sách phát cục bộ có thể đặt ảnh bìa tùy chỉnh cố định: tệp poster.png trong thư mục, ảnh tải lên, hoặc ảnh bìa của một bài trong đó. Bản xem trước phong cách lời bài hát và công viên chủ đề có thể chuyển sang Trực tiếp để hiển thị bài đang phát. Bản máy tính thêm cài đặt Làm mờ thanh đầu trình phát (mặc định tắt); cửa sổ điều khiển từ xa ghi nhớ vị trí lần trước, và nền tối cho chữ trên nền trong suốt nay là tùy chọn. Danh sách phát QQ Music không còn đồng bộ lại mỗi lần mở, và gói RPM trên Linux không còn xung đột với các ứng dụng Electron khác."
+      }
+    },
     "v0_7_22": {
       "intro": "Chào mừng bạn đến với phiên bản 0.7.22, Bản cập nhật Sparkle — một bản phát hành lớn. Bổ sung nền tảng Qishui Music; giới thiệu phong cách lời bài hát pháo hoa Nhật Bản Hanabi; cho phép tùy chọn phạm vi ngẫu nhiên kiểu lời theo từng bài; trang bị phím tắt điều khiển phát nhạc toàn cầu cho bản máy tính; và cải tiến cài đặt AI chọn trực tiếp nhà cung cấp cùng mô hình.",
       "qishui": {

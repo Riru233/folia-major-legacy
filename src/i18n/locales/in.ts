@@ -3466,6 +3466,33 @@ export default {
         "description": "Setelah masuk, playlist pribadi buatan Anda kini dapat memuat lagu dengan paging sungguhan. Backend yang di-host sendiri harus memakai qq-music-api 3.1.2 atau lebih baru; backend lama beralih otomatis, dan playlist yang tidak dapat dibaca kini menjelaskan bahwa playlist itu tidak publik, alih-alih tampil kosong tanpa keterangan."
       }
     },
+    "v0_7_23": {
+      "intro": "Selamat datang di 0.7.23. Aplikasi desktop menambahkan mesin pemutaran mpv yang mengirim lagu lokal dan Navidrome ke perangkat output apa adanya; ReplayGain mendapat mode Pintar yang menyesuaikan berdasarkan kenyaringan terukur; filter lirik kini berupa daftar aturan; Tempera mendapat efek drum baru, Kedalaman Tinta; dan antarmuka kini tersedia dalam bahasa Vietnam.",
+      "hifi": {
+        "title": "Pemutaran HiFi Bit-Perfect",
+        "description": "Desktop mendapat pilihan Mesin pemutaran di bagian atas Pengaturan → Pemutaran: file lokal dan Navidrome bisa beralih ke mpv, yang mengirim audio ke perangkat output dalam format asli file sumber, dengan mode eksklusif di Windows dan macOS serta transisi tanpa jeda saat lagu berikutnya juga diputar lewat mpv. Di Windows dan macOS, mpv bisa diunduh dengan sekali klik (beralih ke mirror saat GitHub tidak bisa dijangkau, dengan tautan penyimpanan awan untuk unduhan manual); Linux memakai mpv yang terpasang di sistem. Lencana di samping bilah progres dan panel jalur sinyal menunjukkan apakah lagu diputar bit-perfect dan konversi apa yang terjadi di jalan. Dengan mpv, lagu-lagu ini melewati equalizer, efek audio, ReplayGain, fade, transisi pintar, spektrum, dan ekspor video lirik; lagu online selalu memakai Web Audio."
+      },
+      "smartBalance": {
+        "title": "Penyeimbang Volume Pintar",
+        "description": "ReplayGain mendapat mode Pintar: mengukur kenyaringan setiap lagu, mengecilkan lagu yang terlalu keras dan menaikkan lagu yang pelan sejauh tidak sampai clipping, tanpa perlu tag gain di file. Mode ini belajar sambil lagu diputar dan menyesuaikan paling banyak sekali per pemutaran; hasil pengukurannya disimpan terpisah dan bisa dihapus di Data Pintar pada halaman Penyimpanan."
+      },
+      "lyricFilter": {
+        "title": "Aturan Filter Lirik",
+        "description": "Filter lirik kini berupa daftar aturan: diawali, mengandung, seluruh baris, diakhiri, daftar kata, dan ekspresi. Saat mengedit, Anda bisa melihat baris mana yang dihapus setiap aturan dari lagu ini dan dari lagu yang pernah diputar; ekspresi tulisan tangan dicoba dulu di latar belakang, dan yang berjalan terlalu lama tidak akan berlaku. Pengaturan filter lama dikonversi otomatis, dan menutup jendela dengan perubahan yang belum disimpan akan meminta konfirmasi."
+      },
+      "temperaInk": {
+        "title": "Tempera: Kedalaman Tinta",
+        "description": "Mode ketukan pintar Tempera menambahkan Kedalaman Tinta: setiap kick dan snare, noda tinta berwarna tema mekar di layar, meninggalkan bekas samar di kertas di antara ketukan. Pemandangan juga mendapat kedalaman: watermark dan gambar belakang berada di belakang dengan sedikit blur, lirik gema dan gambar depan melayang di depan, lapisan dekat dan jauh bergerak dengan kecepatan berbeda saat kamera bergeser, dan kedalaman lirik mengikuti ukurannya. Kedalaman bidang, geser kamera, dan kedalaman lirik masing-masing punya penggeser kekuatan di pengaturan gaya."
+      },
+      "vietnamese": {
+        "title": "Antarmuka Bahasa Vietnam",
+        "description": "Antarmuka kini tersedia dalam bahasa Vietnam (Tiếng Việt), diterjemahkan oleh kontributor komunitas; beralih lewat pengaturan bahasa atau palet perintah. Ikuti sistem kini memilih bahasa sistem saat ini setiap kali aplikasi dibuka, jadi perubahan bahasa sistem berlaku saat Folia dibuka berikutnya, dan aplikasi macOS tidak lagi tampil dalam bahasa Inggris di sistem berbahasa Tionghoa."
+      },
+      "moreDetails": {
+        "title": "Peningkatan Lainnya",
+        "description": "Saat masuk ke YouTube Music, video musik resmi di daftar tampil dan diputar sebagai versi audio resmi, dan video yang tidak punya pasangan ditandai MV. Kartu lagu di halaman pemutar bisa diseret ke posisi baru. Folder, album, dan playlist lokal bisa diberi sampul khusus yang tetap: poster.png di folder, gambar yang diunggah, atau sampul salah satu lagunya. Pratinjau gaya lirik dan taman tema bisa beralih ke Langsung untuk menampilkan lagu yang sedang diputar. Desktop menambahkan pengaturan Header Pemutar Buram (nonaktif secara bawaan); jendela kendali jarak jauh mengingat posisi terakhirnya, dan latar teks gelap di latar transparannya kini opsional. Playlist QQ Music tidak lagi disinkronkan ulang setiap kali dibuka, dan paket RPM Linux tidak lagi bentrok dengan aplikasi Electron lain."
+      }
+    },
     "v0_7_22": {
       "intro": "Ini versi Beta 0.7.22, dirilis lebih awal agar semua orang bisa mencicipi 0.7.22 sebelum rilis resminya — seluruh pemutar terlihat bening dan tembus pandang.",
       "glassUpgrade": {
