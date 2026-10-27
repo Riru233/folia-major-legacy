@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { MutableRefObject } from 'react';
 import type { MotionValue } from 'framer-motion';
 import type {
     AudioBands,
@@ -39,13 +40,21 @@ import {
     resolveObsBrowserSourceCoverUrl,
     resolveObsBrowserSourceImageAsset,
     resolveObsBrowserSourceImageAssets,
+    buildObsBrowserSourceClock,
 } from '../utils/obsBrowserSource';
 import type { TemperaLayerImage } from '../types';
 import { loadTemperaLayerImageBlobs } from '../services/temperaLayerImages';
 import type { VisualizerTuningBundle } from '../components/visualizer/tuningRegistry';
 import type { VisualizerBackgroundConfig } from '../components/visualizer/backgrounds/definition';
 import { getSongAlbumLabel, getSongArtistLabel } from '../services/onlineMusic/songMetadata';
-import { selectDisplayPlayerState, usePlaybackStore } from '../stores/usePlaybackStore';
+import { omni } from '../services/onlineMusic/omni';
+import {
+    selectDisplayDuration,
+    selectDisplayLyrics,
+    selectDisplayPlayerState,
+    selectDisplaySong,
+    usePlaybackStore,
+} from '../stores/usePlaybackStore';
 import { useThemeSettingsStore } from '../stores/useThemeSettingsStore';
 import { useVisualizerSettingsStore } from '../stores/useVisualizerSettingsStore';
 import { useTypographySettingsStore } from '../stores/useTypographySettingsStore';
@@ -67,6 +76,8 @@ type UseObsBrowserSourcePublisherOptions = {
 
 
     isElectronWindow: boolean;
+    audioRef: MutableRefObject<HTMLAudioElement | null>;
+    getDisplayAudioElement?: () => HTMLAudioElement | null;
     stageSource: StageSource | null;
     coverUrl: string | null;
     offsetMs: number;
@@ -113,6 +124,8 @@ const resolveTemperaLayerAssets = async (
 
 export const useObsBrowserSourcePublisher = ({
     isElectronWindow,
+    audioRef,
+    getDisplayAudioElement,
     stageSource,
     coverUrl,
     offsetMs,
@@ -319,10 +332,6 @@ export const useObsBrowserSourcePublisher = ({
         visualizerOpacity,
     ]);
 
-    const playbackRoute = usePlaybackStore(state => state.playbackRoute);
-    const currentSong = usePlaybackStore(selectDisplaySong);
-    const lyrics = usePlaybackStore(selectDisplayLyrics);
-    const duration = usePlaybackStore(selectDisplayDuration);
     const buildClock = useCallback((): ObsBrowserSourceClock => {
         // The HiFi media shim on the HiFi route: its source names no preview clip, so the clip start is 0.
         const displayedAudio = getObservedMedia(getDisplayAudioElement?.() ?? audioRef.current);

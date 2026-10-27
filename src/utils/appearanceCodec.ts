@@ -675,7 +675,7 @@ export const decompressConfig = (str: string): any => {
         || parsed.lwbb !== undefined
         || parsed.lwsd !== undefined
         // 流体玻璃只有自己一组时，也要认成短码形态。
-        || parsed.lgt !== undefined;
+        || parsed.lgt !== undefined
         || parsed.phb !== undefined;
     if (isMinified) {
         const decompressed: any = {};
