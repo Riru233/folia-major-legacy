@@ -2314,7 +2314,7 @@ const mainLocale = {
   },
 };
 
-// Maps an arbitrary BCP 47 tag onto one of the four locales the main process ships.
+// Maps an arbitrary BCP 47 tag onto one of the five locales the main process ships.
 // Returns null for unsupported tags so callers can keep walking the preference list.
 function normalizeMainLocaleKey(value) {
   if (typeof value !== 'string' || !value) {
@@ -2325,7 +2325,7 @@ function normalizeMainLocaleKey(value) {
   if (lowered === 'in' || lowered.startsWith('id')) {
     return 'in';
   }
-  if (lowered === 'vi' || lowered.startsWith('vi')) {
+  if (lowered === 'vi' || lowered.startsWith('vi-')) {
     return 'vi';
   }
   // Same script/region split the renderer applies in src/i18n/config.ts: an explicit
