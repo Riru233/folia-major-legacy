@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: write
+  # 在临时分支上派发 PR Unit Tests，见下面的“Run required checks on the commit”。
+  actions: write
 
 # 串行执行：并发的两次 push 各自 checkout 后推同一个分支会撞车。
 concurrency:
@@ -20,6 +22,7 @@ jobs:
   sync:
     name: Regenerate code map
     runs-on: ubuntu-latest
+    timeout-minutes: 40
 
     steps:
       - name: Check out Git repository
@@ -37,6 +40,7 @@ jobs:
         run: npm run codemap
 
       - name: Commit when the map moved
+        id: commit
         run: |
           if git diff --quiet -- docs/CODEMAP.md; then
             echo "代码地图已经是最新的，无需提交。"
@@ -48,4 +52,47 @@ jobs:
           # GITHUB_TOKEN 推的 commit 本来就不会触发 workflow；[skip ci] 是换成 PAT 时的兜底，
           # 否则 canary-pre-release 的 `push: branches: ['**']` 会被每次结构变动带起来。
           git commit -m 'chore(dev): 同步代码地图 [skip ci]'
-          git push
+          echo "branch=codemap-sync/${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+
+      # main 的分支保护要求 Run unit tests 和 Typecheck sync-server 记在被推上去的那个 commit 上，
+      # GITHUB_TOKEN 绕不过去（直接推会被 GH006 拒）。所以先把 commit 推到临时分支，在它上面派发
+      # PR Unit Tests；GITHUB_TOKEN 的推送不触发 push workflow，workflow_dispatch 是它唯一能带起来的事件。
+      # 跑完后检查就落在同一个 SHA 上，再把它快进推进 main。
+      - name: Run required checks on the commit
+        if: steps.commit.outputs.branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
+        run: |
+          git push origin "HEAD:refs/heads/$BRANCH"
+          gh workflow run pr-unit-tests.yml --ref "$BRANCH"
+          # workflow run 不返回 run id，按唯一的临时分支名找回来。
+          run_id=''
+          for _ in $(seq 30); do
+            run_id=$(gh run list --workflow pr-unit-tests.yml --branch "$BRANCH" --event workflow_dispatch \
+              --json databaseId --jq '.[0].databaseId // empty')
+            [ -n "$run_id" ] && break
+            sleep 5
+          done
+          if [ -z "$run_id" ]; then
+            echo "::error::派发到 $BRANCH 的 PR Unit Tests 没有出现。"
+            exit 1
+          fi
+          gh run watch "$run_id" --exit-status --interval 20
+
+      - name: Push to main
+        if: steps.commit.outputs.branch
+        run: |
+          git fetch origin main
+          # 跑检查的几分钟里 main 又前进了：这份地图已经旧了，新那次 push 会带起下一跑重生成。
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            echo "::notice::main 在跑检查期间已经前进，这份代码地图交给下一跑。"
+            exit 0
+          fi
+          git push origin HEAD:main
+
+      - name: Delete the temporary branch
+        if: always() && steps.commit.outputs.branch
+        env:
+          BRANCH: ${{ steps.commit.outputs.branch }}
+        run: git push origin --delete "$BRANCH" || true
