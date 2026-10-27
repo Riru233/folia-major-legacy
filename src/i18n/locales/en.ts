@@ -2867,7 +2867,7 @@ export default {
     "machiSceneAuto": "Auto",
     "machiSceneKonbini": "Konbini",
     "machiSceneStation": "Gas station",
-    "machiScenePark": "Sakura park",
+    "machiSceneKowloon": "Walled City bar",
     "machiSkySection": "Time and weather",
     "machiTimeOfDay": "Time of day",
     "machiTimeOfDayHint": "Auto follows your local clock: day, dusk or night.",
