@@ -28,18 +28,18 @@ type Box = { x: number; y: number; w: number; h: number };
  * 一行在列表内容里的位置和大小，带小数。不用 offset*：它们取整，各行平分列高时最后一行取整后的底边
  * 可能比列表多 1px，高亮块就把列表撑出滚动条；滚动条让行变窄、溢出消失，再量又变回去，
  * 来回不停到 React 报更新层数超限（#913）。getBoundingClientRect 带着祖先的缩放（窗口打开时的动画），
- * 所以用行的布局高度把缩放除掉。
+ * 所以用行的布局高度把缩放除掉。行没排版（display: none、jsdom）时布局高度是 auto，就不除。
  */
 const measureRow = (list: HTMLElement, row: HTMLElement): Box => {
     const listRect = list.getBoundingClientRect();
     const rowRect = row.getBoundingClientRect();
-    const h = parseFloat(getComputedStyle(row).height);
-    const scale = h > 0 && rowRect.height > 0 ? rowRect.height / h : 1;
+    const height = parseFloat(getComputedStyle(row).height);
+    const scale = height > 0 && rowRect.height > 0 ? rowRect.height / height : 1;
     return {
         x: (rowRect.left - listRect.left) / scale - list.clientLeft + list.scrollLeft,
         y: (rowRect.top - listRect.top) / scale - list.clientTop + list.scrollTop,
         w: rowRect.width / scale,
-        h,
+        h: rowRect.height / scale,
     };
 };
 
