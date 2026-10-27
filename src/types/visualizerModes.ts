@@ -21,6 +21,7 @@ export const BUILTIN_VISUALIZER_MODES = [
     'nebbia',
     'fume',
     'hanabi',
+    'konbini',
     'lumiere',
     'monet',
     'partita',
