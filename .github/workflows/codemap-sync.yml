@@ -12,6 +12,8 @@ permissions:
   contents: write
   # 在临时分支上派发 PR Unit Tests，见下面的“Run required checks on the commit”。
   actions: write
+  # 检查跑完后经 PR 合进 main，见下面的“Merge into main”。
+  pull-requests: write
 
 # 串行执行：并发的两次 push 各自 checkout 后推同一个分支会撞车。
 concurrency:
@@ -54,10 +56,12 @@ jobs:
           git commit -m 'chore(dev): 同步代码地图 [skip ci]'
           echo "branch=codemap-sync/${{ github.run_id }}" >> "$GITHUB_OUTPUT"
 
-      # main 的分支保护要求 Run unit tests 和 Typecheck sync-server 记在被推上去的那个 commit 上，
-      # GITHUB_TOKEN 绕不过去（直接推会被 GH006 拒）。所以先把 commit 推到临时分支，在它上面派发
-      # PR Unit Tests；GITHUB_TOKEN 的推送不触发 push workflow，workflow_dispatch 是它唯一能带起来的事件。
-      # 跑完后检查就落在同一个 SHA 上，再把它快进推进 main。
+      # main 的分支保护要求 Run unit tests 和 Typecheck sync-server 通过，GITHUB_TOKEN 绕不过去。
+      # 所以先把 commit 推到临时分支，在它上面派发 PR Unit Tests；GITHUB_TOKEN 的推送不触发 push
+      # workflow，workflow_dispatch 是它唯一能带起来的事件。检查跑完后经 PR 合进 main：直接
+      # `git push origin HEAD:main` 即使检查已经绿在同一个 SHA 上，也会被 GH006 以
+      # “2 of 2 required status checks are expected” 拒掉（run 40492106867），
+      # 推送时的保护校验不认临时分支上派发出来的检查；PR 按 head SHA 认它们。
       - name: Run required checks on the commit
         if: steps.commit.outputs.branch
         env:
@@ -80,8 +84,11 @@ jobs:
           fi
           gh run watch "$run_id" --exit-status --interval 20
 
-      - name: Push to main
+      - name: Merge into main
         if: steps.commit.outputs.branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
         run: |
           git fetch origin main
           # 跑检查的几分钟里 main 又前进了：这份地图已经旧了，新那次 push 会带起下一跑重生成。
@@ -89,7 +96,11 @@ jobs:
             echo "::notice::main 在跑检查期间已经前进，这份代码地图交给下一跑。"
             exit 0
           fi
-          git push origin HEAD:main
+          # GITHUB_TOKEN 开的 PR 不会触发 pull_request workflow，必需检查用的就是上一步落在这个 SHA 上的那两个。
+          gh pr create --base main --head "$BRANCH" \
+            --title 'chore(dev): 同步代码地图 [skip ci]' \
+            --body "由 Sync Code Map 自动生成（run ${{ github.run_id }}），必需检查已在本分支上跑过。"
+          gh pr merge "$BRANCH" --squash --subject 'chore(dev): 同步代码地图 [skip ci]' --body ''
 
       - name: Delete the temporary branch
         if: always() && steps.commit.outputs.branch
