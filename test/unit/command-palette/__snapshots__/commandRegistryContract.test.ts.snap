@@ -206,7 +206,6 @@ exports[`command palette registry contract > keeps the registered command order 
   "settings-language-en",
   "settings-language-in",
   "settings-language-vi",
-=======
   "hifi-toggle",
   "hifi-settings",
   "hifi-exclusive-toggle",
