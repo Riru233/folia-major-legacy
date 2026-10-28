@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildHomeSurfacePresentation } from '../../../src/components/app/presentation/buildHomeSurfacePresentation';
 import {
     LIBRARY_BACKDROP_BLUR_PX,
+    resolveVisualizerBackAction,
     resolveVisualizerBackdropBlur,
     resolveVisualizerShowText,
     visualizerBackdropStyle,
@@ -60,5 +61,22 @@ describe('visualizer blur behind the library wall', () => {
         expect(visualizerBackdropStyle(true)).toBe(visualizerBackdropStyle(true));
         expect(visualizerBackdropStyle(true).filter).toBe(`blur(${LIBRARY_BACKDROP_BLUR_PX}px)`);
         expect(visualizerBackdropStyle(false).filter).toBeUndefined();
+    });
+});
+
+describe('visualizer back button', () => {
+    const back = () => 'navigate-home';
+
+    it('is offered on the player page only', () => {
+        expect(resolveVisualizerBackAction('player', back)).toBe(back);
+    });
+
+    it('is withheld on the home page, where the renderer stays mounted behind the wall', () => {
+        // 首页墙后仍挂着 visualizer：给了按钮就会在首页左上角留下一颗回播放页的按钮。
+        expect(resolveVisualizerBackAction('home', back)).toBeUndefined();
+    });
+
+    it('is withheld on Lattice, whose hand-off keeps the renderer mounted', () => {
+        expect(resolveVisualizerBackAction('lattice', back)).toBeUndefined();
     });
 });
