@@ -31,6 +31,7 @@ import type {
 } from "./floating-player/playerControlSlotActions";
 import { usePlayerOverlayObstacle } from "../hooks/usePlayerOverlayLayout";
 import { useGlass } from "../shinoinject/useGlass.tsx";
+import { releaseGlassJelly } from "../shinoinject/liquidglass.ts";
 import { HifiProgressRow } from "./hifi/HifiBadge";
 import { useIsHifiRoute } from "./hifi/useHifiSignalPath";
 import { resolveLyricSeekMediaTime } from "../utils/lyrics/lyricSeekTime";
@@ -53,6 +54,20 @@ const CONTROL_LAYOUT_SPRING = {
   stiffness: 280,
   damping: 24,
 };
+
+/*
+ * 页面切换时胶囊的宽高 / 圆角整套变化，走 framer 的 layout 动画，动画期间逐帧改写 inline transform。
+ * 果冻会话同样在写 transform（收编 base 后叠加形变），两者同时进行会互相覆盖：
+ * 切换那一瞬间按下的拖拽会被 layout 修正吃掉，观感上就是「果冻失效」。
+ * 所以切换时先摘掉 data-glass-jelly 并收掉进行中的会话，等动画放完再挂回去。
+ *
+ * 判定只看 DOM：每帧比一次胶囊的 inline transform，连续静默若干帧即视为落定。不依赖 framer 的
+ * 动画回调 —— 尺寸没变时它根本不触发，而单纯用固定超时又会在这段时间里真的没有果冻。
+ * 超时只是最后一道保险，防动画被中断后一直挂着。
+ */
+const JELLY_REARM_QUIET_FRAMES = 6;
+const JELLY_REARM_MIN_WAIT_MS = 180;
+const JELLY_REARM_MAX_WAIT_MS = 1200;
 
 const HOVER_EXPAND_DELAY_MS = 20;
 const HOVER_COLLAPSE_DELAY_MS = 100;
@@ -171,6 +186,54 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
   const expandTimeoutRef = useRef<number | null>(null);
   const collapseTimeoutRef = useRef<number | null>(null);
+  // 果冻注入开关：页面切换时先摘掉，等胶囊的 layout 动画放完再挂回去。
+  const [jellyArmed, setJellyArmed] = useState(true);
+  const jellyRearmRafRef = useRef<number | null>(null);
+  const capsuleElRef = useRef<HTMLElement | null>(null);
+  const disarmJelly = useCallback(() => {
+    // 先让进行中的会话收摊：它写的是同一个 inline transform，留着会和 layout 动画互相覆盖。
+    releaseGlassJelly();
+    setJellyArmed(false);
+    if (jellyRearmRafRef.current !== null) {
+      cancelAnimationFrame(jellyRearmRafRef.current);
+      jellyRearmRafRef.current = null;
+    }
+    // 等 transform 连续若干帧不再变化（layout spring 放完）再挂回果冻。
+    // 读的是 inline transform（framer 的 layout 动画逐帧写这里），不触发样式重算；
+    // 只靠 DOM 状态判断，不依赖动画库的回调。超时是动画被打断时的保险。
+    const startedAt = performance.now();
+    let lastTransform: string | null = null;
+    let quietFrames = 0;
+    const waitForSettle = () => {
+      jellyRearmRafRef.current = null;
+      const el = capsuleElRef.current;
+      if (!el || !el.isConnected) {
+        setJellyArmed(true);
+        return;
+      }
+      const transform = el.style.transform;
+      quietFrames = transform === lastTransform ? quietFrames + 1 : 0;
+      lastTransform = transform;
+      const elapsed = performance.now() - startedAt;
+      // 至少等一小段：切换那一帧 transform 还没开始变，只比一次会立刻判成「已静止」。
+      const settled = elapsed >= JELLY_REARM_MIN_WAIT_MS
+        && (quietFrames >= JELLY_REARM_QUIET_FRAMES || elapsed >= JELLY_REARM_MAX_WAIT_MS);
+      if (settled) {
+        setJellyArmed(true);
+        return;
+      }
+      jellyRearmRafRef.current = requestAnimationFrame(waitForSettle);
+    };
+    jellyRearmRafRef.current = requestAnimationFrame(waitForSettle);
+  }, []);
+  // 胶囊节点同时交给 overlay 布局注册和果冻重挂的等待逻辑，两个 ref 都要拿到它。
+  const attachCapsule = useCallback(
+    (el: HTMLDivElement | null) => {
+      capsuleElRef.current = el;
+      layoutRef(el);
+    },
+    [layoutRef],
+  );
 
   const bottomBarBottomPx = usePlayerBottomBarBottomPx();
   const isPositioning = usePlayerBottomBarLayoutStore(
@@ -274,6 +337,26 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
       cancelPositioning();
     }
   }, [cancelPositioning, currentView, hideControlBar, isPositioning]);
+
+  // 页面切换会让胶囊的宽度 / 圆角 / 展开形态整套变化，走的是 framer 的 layout 动画。
+  // 那段时间 transform 归动画，果冻先摘掉，等动画放完再挂回；卸载时停掉等待帧。
+  // 只在 currentView 变化时做：悬停展开也会触发 layout 动画，但那时指针正要按下，
+  // 摘掉果冻只会让「一悬停就拖不动」。首次挂载也不摘，那时没有需要让位的动画。
+  const previousViewRef = useRef(currentView);
+  useEffect(() => {
+    if (previousViewRef.current === currentView) {
+      return;
+    }
+    previousViewRef.current = currentView;
+    disarmJelly();
+  }, [currentView, disarmJelly]);
+
+  useEffect(() => () => {
+    if (jellyRearmRafRef.current !== null) {
+      cancelAnimationFrame(jellyRearmRafRef.current);
+      jellyRearmRafRef.current = null;
+    }
+  }, []);
 
   // 卸载时兜底：当前歌曲被清空会让整条控制条不再渲染，上面那个 effect 也就没机会跑，
   // 定位状态会残留成一个谁也退不出的模式。用 getState 读，避免把 cleanup 绑到回调身份上。
@@ -447,12 +530,14 @@ const FloatingPlayerControls: React.FC<FloatingPlayerControlsProps> = ({
             }}
           >
             <motion.div
-              ref={layoutRef}
+              ref={attachCapsule}
               onUpdate={invalidateLayout}
               onLayoutAnimationComplete={invalidateLayout}
               layout
               data-glass
-              data-glass-jelly data-glass-light
+              // 果冻注入开关：页面切换的 layout 动画期间摘掉，动画放完由 disarmJelly 的帧循环挂回。
+              data-glass-jelly={jellyArmed ? "" : undefined}
+              data-glass-light
               transition={{ layout: CONTROL_LAYOUT_SPRING }}
               onClick={handleClick}
               // 用原生 pointer 事件而不是 framer-motion 的 drag：位移已经由 playerBottomBarLiveOffset

@@ -507,9 +507,12 @@ const jellyStopLoop = () => {
 };
 
 // 收摊：停帧、清会话、transform 还原 base（空则清空），下一轮 pointerdown 重新收编外部值。
+// 还原只在我们还握着这个节点的 transform 时做：外部（framer 的 layout 动画、拖拽组件）在最后一次
+// 写入之后又写过新值，那个新值才是当前基准，把会话开始时收编的旧 base 写回去会把动画结果抹掉。
 const jellyFinish = () => {
   jellyStopLoop();
   const el = jEl;
+  const ownsTransform = el !== null && el.style.transform === jLastWritten;
   jEl = null;
   jDragging = false;
   jPointerId = -1;
@@ -519,7 +522,7 @@ const jellyFinish = () => {
   jW0 = jH0 = 0;
   jTOx = jTOy = 0;
   jLastWritten = null;
-  if (el?.isConnected) el.style.transform = jBase;
+  if (el?.isConnected && ownsTransform) el.style.transform = jBase;
 };
 
 // 弹簧是否贴住目标（静止）：按住不动时贴住目标即停帧省电，松手后目标归基准尺寸即回原状。
@@ -565,6 +568,15 @@ const jellyUpdateTarget = () => {
   jTH = clamp(jH0 + dh, jH0 * JELLY_SIZE_MIN_RATIO, jH0 * JELLY_SIZE_MAX_RATIO);
 };
 
+// 外部写进 el.style.transform 的值里，`none` 不能当前缀拼接：
+// framer 的 layout 动画落定后会把 transform 收敛成 "none"，而 `transform: none translate(...) scale(...)`
+// 是非法值，整条声明会被浏览器丢弃 —— 这正是「切过一次页面后胶囊再没有果冻」的成因。
+// 收编时把 none / 空值当作「没有基准」。
+const jellyReadBase = (value: string) => {
+  const trimmed = value.trim();
+  return !trimmed || trimmed === "none" ? "" : trimmed;
+};
+
 // 每帧写入：先收编外部 transform，再合成 base + translate + 由目标尺寸换算出的 scale（无 rotate / skew）。
 const jellyWrite = () => {
   const el = jEl;
@@ -573,7 +585,7 @@ const jellyWrite = () => {
     return;
   }
   const cur = el.style.transform;
-  if (cur !== jLastWritten) jBase = cur; // 外部改写（framer layout / 拖拽组件 inline transform）
+  if (cur !== jLastWritten) jBase = jellyReadBase(cur); // 外部改写（framer layout / 拖拽组件 inline transform）
   const sx = jW0 ? jW / jW0 : 1;
   const sy = jH0 ? jH / jH0 : 1;
   if (Math.abs(jOx) < 0.01 && Math.abs(jOy) < 0.01 && Math.abs(sx - 1) < 0.001 && Math.abs(sy - 1) < 0.001) {
@@ -646,12 +658,18 @@ const jellyOnPointerDown = (e: PointerEvent) => {
   jH = jTH = jH0;
   jVW = jVH = 0;
   jTOx = jTOy = 0;
-  jBase = el.style.transform;
+  jBase = jellyReadBase(el.style.transform);
   jLastWritten = el.style.transform;
 };
 
 const jellyOnPointerMove = (e: PointerEvent) => {
-  if (!jDragging || e.pointerId !== jPointerId || !jEl?.isConnected) return;
+  if (!jDragging || e.pointerId !== jPointerId) return;
+  // 会话中途节点被卸载（换页、整条控制条隐藏）时立刻收摊：留着 jDragging 会让之后所有
+  // pointerdown 都走 early return，表现成「换过页之后果冻再也不响应」。
+  if (!jEl?.isConnected) {
+    jellyFinish();
+    return;
+  }
   jPx = e.clientX;
   jPy = e.clientY;
   jellyUpdateTarget();
@@ -685,6 +703,13 @@ export const installGlassJelly = () => {
 export const setLiquidGlassJellyEnabled = (enabled: boolean) => {
   jellyEnabled = enabled && !LIQUID_GLASS_BLOCKED_BY_GPU_PREFERENCE;
   if (!jellyEnabled) jellyFinish();
+};
+
+// 让进行中的果冻会话立刻收摊（页面切换时由 FloatingPlayerControls 调）：
+// 切换瞬间胶囊正在被 layout 动画改写 transform，这时继续形变观感上是「果冻失灵」，
+// 等动画放完再把 data-glass-jelly 挂回去。
+export const releaseGlassJelly = () => {
+  if (jEl || jDragging) jellyFinish();
 };
 
 /* —— 拖拽光效（data-glass-light 注入）——
