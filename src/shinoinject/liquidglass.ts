@@ -474,6 +474,9 @@ let jellyInstalled = false;
 let jellyEnabled = !LIQUID_GLASS_BLOCKED_BY_GPU_PREFERENCE && readStoredFlag(LIQUID_GLASS_EFFECT_KEYS.jelly);
 let jEl: HTMLElement | null = null;
 let jPointerId = -1;
+// 触屏会话对应的 Touch.identifier：pointercancel 之后 pointermove 不再派发，改由 touchmove 跟手，
+// 靠它从 touches 里挑出同一根手指。null 表示这一轮不是触屏会话（或还没收到 touchstart）。
+let jTouchId: number | null = null;
 let jDragging = false;
 let jStartPX = 0;
 let jStartPY = 0;
@@ -516,6 +519,7 @@ const jellyFinish = () => {
   jEl = null;
   jDragging = false;
   jPointerId = -1;
+  jTouchId = null;
   jOx = jVoX = jOy = jVoY = 0;
   jW = jVW = jH = jVH = 0;
   jTW = jTH = 0;
@@ -641,12 +645,15 @@ const jellyEnsureLoop = () => {
 const jellyOnPointerDown = (e: PointerEvent) => {
   if (!jellyEnabled || jDragging || typeof window === "undefined") return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  // 多指触控只认主指针：第二根手指落下不该把进行中的会话抢过去。
+  if (e.pointerType === "touch" && !e.isPrimary) return;
   // data-glass-jelly 是果冻注入开关：命中该属性的玻璃才参与拖拽果冻。
   const el = e.target instanceof Element ? e.target.closest<HTMLElement>("[data-glass-jelly]") : null;
   if (!el) return;
   if (jEl) jellyFinish(); // 上一会话还有尾巴（如松手前又按下），先收干净
   jEl = el;
   jPointerId = e.pointerId;
+  jTouchId = null;
   jDragging = true;
   jStartPX = jPx = e.clientX;
   jStartPY = jPy = e.clientY;
@@ -680,10 +687,64 @@ const jellyEndPointer = () => {
   if (!jDragging) return;
   jDragging = false;
   jPointerId = -1;
+  jTouchId = null;
   jTOx = jTOy = 0; // 松手：位移目标归零，弹簧把元素带回原位
   jTW = jW0; // 尺寸目标回到基准宽 / 高，尺寸弹簧把形变收回去
   jTH = jH0;
   jellyEnsureLoop();
+};
+
+/* —— 触屏补位 ——
+   手指按住移动时，浏览器一旦判定这是滚动 / 平移手势就会发 pointercancel 并接管指针，
+   之后不再派发 pointermove。若按鼠标那套在 pointercancel 收摊，手指还在屏幕上形变却已经弹回，
+   表现成「触屏没有果冻」。所以 pointercancel 只对鼠标收摊，触屏改由 touchmove 继续跟手、
+   touchend / touchcancel 收场（和上面光效的处理一致）。
+   这里不 preventDefault：果冻元素大多是可滚动区域里的卡片和按钮，吃掉滚动会让整页拖不动。
+   代价是滚动中也会形变；用位移阈值把它压到「按稳了才动」的观感上（见 JELLY_TOUCH_SLOP）。 */
+const JELLY_TOUCH_SLOP = 8; // 触屏起手容差（px）：手指移动小于它不形变，避免点按和滚动时抖一下
+
+const jellyTouchPoint = (e: TouchEvent) => {
+  if (jTouchId === null) return e.touches[0] ?? null;
+  for (let i = 0; i < e.touches.length; i += 1) {
+    if (e.touches[i].identifier === jTouchId) return e.touches[i];
+  }
+  return null;
+};
+
+const jellyOnTouchStart = (e: TouchEvent) => {
+  if (!jDragging || jTouchId !== null) return;
+  const t = e.changedTouches[0];
+  if (!t) return;
+  jTouchId = t.identifier;
+};
+
+const jellyOnTouchMove = (e: TouchEvent) => {
+  if (!jDragging) return;
+  const t = jellyTouchPoint(e);
+  if (!t) return;
+  if (jTouchId === null) jTouchId = t.identifier;
+  if (!jEl?.isConnected) {
+    jellyFinish();
+    return;
+  }
+  // 起手容差：小范围移动（点按的手抖、刚开始滚）不形变，过了阈值再跟手。
+  if (Math.hypot(t.clientX - jStartPX, t.clientY - jStartPY) < JELLY_TOUCH_SLOP) return;
+  jPx = t.clientX;
+  jPy = t.clientY;
+  jellyUpdateTarget();
+  jellyEnsureLoop();
+};
+
+const jellyOnTouchEnd = () => {
+  if (!jDragging) return;
+  jellyEndPointer();
+};
+
+// 触屏的 pointercancel 是浏览器接管手势（滚动 / 平移），不是松手：这时收摊会让形变立刻弹回，
+// 所以只对鼠标收；触屏的会话由 touchmove 续跟、touchend / touchcancel 收场。
+const jellyOnPointerCancel = (e: PointerEvent) => {
+  if (e.pointerType !== "mouse") return;
+  jellyEndPointer();
 };
 
 // 由 useGlass 在 commit 后调一次（幂等）：挂 window 级指针监听。
@@ -693,7 +754,11 @@ export const installGlassJelly = () => {
   window.addEventListener("pointerdown", jellyOnPointerDown, { capture: true });
   window.addEventListener("pointermove", jellyOnPointerMove, { passive: true });
   window.addEventListener("pointerup", jellyEndPointer);
-  window.addEventListener("pointercancel", jellyEndPointer);
+  window.addEventListener("pointercancel", jellyOnPointerCancel);
+  window.addEventListener("touchstart", jellyOnTouchStart, { passive: true });
+  window.addEventListener("touchmove", jellyOnTouchMove, { passive: true });
+  window.addEventListener("touchend", jellyOnTouchEnd);
+  window.addEventListener("touchcancel", jellyOnTouchEnd);
   window.addEventListener("blur", jellyEndPointer);
   document.addEventListener("visibilitychange", jellyEndPointer);
 };
