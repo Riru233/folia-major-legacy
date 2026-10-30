@@ -1,5 +1,5 @@
 import { MASK_SCALE } from './nebbiaConstants';
-import { link, makeTex, type Tex } from './nebbiaGlUtils';
+import { checkLinked, compileShader, makeTex, startProgram, type Tex } from './nebbiaGlUtils';
 import { SEGMENT_FLOATS, type NebbiaSegments } from './nebbiaSegments';
 
 // src/components/visualizer/nebbia/nebbiaMaskGl.ts
@@ -51,10 +51,12 @@ export class NebbiaMaskGl {
     private readonly fb: WebGLFramebuffer;
     private w = 1; private h = 1;
 
-    /** `mainProg` 要是当前程序（绑 uMask 的采样单元）。 */
+    /** `mainProg` 要是当前程序（采样器 uMask 由 nebbiaGl 在 ready 里绑到 unit）。 */
     constructor(private readonly gl: WebGL2RenderingContext, mainProg: WebGLProgram, unit: number) {
-        this.tex = makeTex(gl, mainProg, unit, 'uMask');
-        this.prog = link(gl, MASK_VS, MASK_FS);
+        this.tex = makeTex(gl, unit);
+        gl.uniform1i(gl.getUniformLocation(mainProg, 'uMask'), unit);
+        this.prog = startProgram(gl, compileShader(gl, gl.VERTEX_SHADER, MASK_VS), compileShader(gl, gl.FRAGMENT_SHADER, MASK_FS), { aCorner: 0, aSeg: 1, aParam: 2 });
+        checkLinked(gl, this.prog);
         this.uView = gl.getUniformLocation(this.prog, 'uView');
         this.fb = gl.createFramebuffer()!;
         this.vao = gl.createVertexArray()!;

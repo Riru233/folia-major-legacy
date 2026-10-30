@@ -2,6 +2,7 @@ import { FOG_DIV, NEBBIA_FIXED } from './nebbiaConstants';
 import raindropSpriteUrl from './nebbiaRaindrop.png';
 import { makeTex, type NebbiaUniforms, type Tex } from './nebbiaGlUtils';
 import { canRenderFogToFloat, NebbiaProgramBuild } from './nebbiaPrograms';
+import { NebbiaBuildingCache } from './nebbiaBuildingCache';
 import { NebbiaMaskGl } from './nebbiaMaskGl';
 import type { NebbiaSegments } from './nebbiaSegments';
 
@@ -36,6 +37,8 @@ export class NebbiaGl {
     private uFogB: WebGLUniformLocation | null = null;
     private linked = false;
     private readonly mask: NebbiaMaskGl; private readonly drop: Tex; private readonly field: Tex; private readonly sprite: Tex; private readonly breath: Tex;
+    /** 楼群缓存：主程序编好之后才有。 */
+    private bld: NebbiaBuildingCache | null = null;
     private readonly fogTex: Tex[];
     private readonly fogOK: boolean;
     private readonly fogFbs: WebGLFramebuffer[] = [];
@@ -98,6 +101,8 @@ export class NebbiaGl {
         const samplers: [string, Tex][] = [['uMask', this.mask.tex], ['uDrop', this.drop], ['uField', this.field], ['uFogBlur', this.fogTex[0]], ['uFogGlow', this.fogTex[1]], ['uBreath', this.breath]];
         for (const [name, tex] of samplers) gl.uniform1i(gl.getUniformLocation(main, name), tex.unit);
         gl.uniform1f(this.U.uBreathThick, NEBBIA_FIXED.breathThick);
+        // 楼群缓存的取样器与补画用的 uniform 都在主程序上；缓存要主程序编好之后才建得起来
+        this.bld = new NebbiaBuildingCache(gl, main, 9, this.U);
         if (fog) {
             this.F = locate(gl, fog, SCENE_UNIFORMS);
             this.uFogB = gl.getUniformLocation(fog, 'uFogB');
@@ -171,6 +176,8 @@ export class NebbiaGl {
             });
         }
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        // 楼群缓存的尺寸跟着画布走；它要主程序编好才建得起来
+        this.bld?.resize(this.canvas.width, this.canvas.height, Math.max(1, Math.ceil(this.canvas.height / FOG_DIV)));
     }
 
     // 水珠实例画进一张水珠纹理（CSS 分辨率）
@@ -223,6 +230,13 @@ export class NebbiaGl {
         this.renderDrops(this.drop, drops);
         this.renderDrops(this.field, field);
         gl.bindVertexArray(this.quadVao);
+        // 楼群缓存要在雾的预渲染之前补画（那时主程序是当前程序、全屏四边形已绑好）；
+        // 还没画好的档，着色器里照旧现算
+        if (this.bld) {
+            gl.useProgram(main);
+            this.setScene(U, u);
+            this.bld.update(u.time * u.bus);
+        }
         if (fog) {
             // 预渲染不采样任何纹理，画进雾纹理不会和主画面的采样单元成反馈环
             gl.useProgram(fog);
