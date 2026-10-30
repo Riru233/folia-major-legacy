@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { usePlayerChromeSettingsStore } from "../stores/usePlayerChromeSettingsStore";
 import { useAppChromeStore } from "../stores/useAppChromeStore";
+<<<<<<< HEAD
 import { useGlass } from "@/shinoinject/useGlass";
 
 // 与 AppShell 的 TITLEBAR_REVEAL_HEIGHT、播放桥的 revealThreshold 一致：顶部 56px 是标题栏热区。
@@ -26,6 +27,8 @@ type ControlId =
   | "minimize"
   | "maximize"
   | "close";
+=======
+>>>>>>> 9e1f0145 (add(touch): 增加触控状态下(Surface)二次确认关闭的操作，防止误触)
 
 export default function WindowControls({
   revealed,
@@ -41,6 +44,7 @@ export default function WindowControls({
   const { t } = useTranslation();
   const [isMaximized, setIsMaximized] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+<<<<<<< HEAD
   // 指针是否停在控制栏上：没固定时靠它把按钮留在可见状态，移开就随标题栏一起收起。
   const [isPointerInside, setIsPointerInside] = useState(false);
   // 触控按压中：整条控制栏一起放大到 1.5 倍，抬手或手势被取消就还原。
@@ -67,6 +71,21 @@ export default function WindowControls({
   );
   const handleToggleAlwaysShowMainWindowTitlebar = usePlayerChromeSettingsStore(
     (state) => state.handleToggleAlwaysShowMainWindowTitlebar,
+=======
+  // 触摸屏上第一次点窗口控制按钮只进入 touch 模式并放大 1.5x，不执行按钮动作；
+  // 放大后再点才真正触发，触发后保持放大，只有点到别处才恢复正常状态。鼠标点击不进入 touch 模式，也不被拦截。
+  const [isTouchMode, setIsTouchMode] = useState(false);
+  // 用 ref 同步判定，避免同一帧内 state 还没更新就被 onClick 读到旧值。
+  const isTouchModeRef = useRef(false);
+  // 本次点击是否已经在 pointerdown 时被吞掉，避免同一次点击的 onClick 重复执行动作。
+  const swallowNextClickRef = useRef(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const useNativeMacFullscreenButton = usePlayerChromeSettingsStore(
+    (state) => state.useNativeMacFullscreenButton,
+  );
+  const setIsTitlebarRevealed = useAppChromeStore(
+    (state) => state.setIsTitlebarRevealed,
+>>>>>>> 9e1f0145 (add(touch): 增加触控状态下(Surface)二次确认关闭的操作，防止误触)
   );
   const electron = window.electron;
   const isMac = electron?.platform === "darwin";
@@ -100,6 +119,7 @@ export default function WindowControls({
     };
   }, [electron]);
 
+<<<<<<< HEAD
   // 三个可见性开关统一由这一处决定：固定时始终可见；没固定时看标题栏是否被叫出、或指针是否停在按钮上。
   // 触控按住期间也算可见：手指拖动会离开控制栏矩形，不能因此在按住的中途把按钮收起来。
   const controlsVisible =
@@ -129,6 +149,77 @@ export default function WindowControls({
       window.removeEventListener("pointermove", handleMove);
     };
   }, [isTitlebarPinned, isMainWindowClickThroughEnabled]);
+=======
+  const exitTouchMode = () => {
+    isTouchModeRef.current = false;
+    swallowNextClickRef.current = false;
+    setIsTouchMode(false);
+  };
+
+  // 点到别处（窗口控制区以外）就恢复正常状态，包括触摸和鼠标。
+  useEffect(() => {
+    if (!isTouchMode) return;
+    const handleOutsidePointerDown = (event: PointerEvent) => {
+      if (rootRef.current?.contains(event.target as Node)) return;
+      exitTouchMode();
+    };
+    document.addEventListener("pointerdown", handleOutsidePointerDown, true);
+    return () => {
+      document.removeEventListener(
+        "pointerdown",
+        handleOutsidePointerDown,
+        true,
+      );
+    };
+  }, [isTouchMode]);
+
+  // 按钮被收起（标题栏隐藏或进入点击穿透）时一并恢复正常状态，避免下次出现时仍是放大的。
+  useEffect(() => {
+    if (!revealed) exitTouchMode();
+  }, [revealed]);
+
+  // 控件隐藏时，落在按钮区域上的触摸不穿透、也不一次性操作下面的界面：
+  // 只把标题栏叫出来、把按钮直接放大到 touch 模式，等用户看清后再点。
+  // 用坐标判定而不是盖一层热区，鼠标完全不受影响。
+  useEffect(() => {
+    if (revealed || isMainWindowClickThroughEnabled) return;
+    const handleHiddenTouch = (event: PointerEvent) => {
+      if (event.pointerType !== "touch") return;
+      const root = rootRef.current;
+      if (!root) return;
+      const rect = root.getBoundingClientRect();
+      if (
+        event.clientX < rect.left ||
+        event.clientX > rect.right ||
+        event.clientY < rect.top ||
+        event.clientY > rect.bottom
+      ) {
+        return;
+      }
+      // 拦下这次触摸，避免它落到下面的页面上触发别的操作。
+      event.stopPropagation();
+      event.preventDefault();
+      setIsTitlebarRevealed(true);
+      isTouchModeRef.current = true;
+      setIsTouchMode(true);
+      // 手指抬起后浏览器仍会补一个 click，它会落到刚出现的按钮或下面的页面上；
+      // 这里一次性吞掉它，保证这一次触摸只负责“显示并放大”，不执行任何操作。
+      const swallowClick = (clickEvent: MouseEvent) => {
+        clickEvent.stopPropagation();
+        clickEvent.preventDefault();
+        document.removeEventListener("click", swallowClick, true);
+      };
+      document.addEventListener("click", swallowClick, true);
+      window.setTimeout(() => {
+        document.removeEventListener("click", swallowClick, true);
+      }, 500);
+    };
+    document.addEventListener("pointerdown", handleHiddenTouch, true);
+    return () => {
+      document.removeEventListener("pointerdown", handleHiddenTouch, true);
+    };
+  }, [revealed, isMainWindowClickThroughEnabled, setIsTitlebarRevealed]);
+>>>>>>> 9e1f0145 (add(touch): 增加触控状态下(Surface)二次确认关闭的操作，防止误触)
 
   if (!electron) return null;
 
@@ -159,6 +250,7 @@ export default function WindowControls({
       : "pointer-events-none opacity-0 -translate-y-1"
   }`;
 
+<<<<<<< HEAD
   // 手指划过的那个按钮上的 hover 光斑：以手指在按钮内的 Y 为中心，模拟鼠标 hover。
   // 用一层绝对定位的渐变而不是改按钮背景色，鼠标的 hover:bg-[#307aa9] 不受影响。
   const touchHoverOverlay = (control: ControlId) =>
@@ -320,10 +412,29 @@ export default function WindowControls({
   const handleClickCapture = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!swallowClickRef.current) return;
     swallowClickRef.current = false;
+=======
+  // 只在 pointerdown 阶段判定：touch 进入 touch 模式并吞掉本次点击，mouse 点击既不进入也不退出。
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    swallowNextClickRef.current = false;
+    if (event.pointerType !== "touch") return;
+    if (isTouchModeRef.current) return;
+    isTouchModeRef.current = true;
+    setIsTouchMode(true);
+    // 这一次点击只用来进入 touch 模式，不执行按钮动作。
+    swallowNextClickRef.current = true;
+  };
+
+  // 捕获阶段拦下被吞掉的那次点击，按钮自己的 onClick 不会再执行。
+  // 放行的那次点击是真实操作，动作照常执行；执行完不缩小，保持放大状态直到点到别处。
+  const handleClickCapture = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!swallowNextClickRef.current) return;
+    swallowNextClickRef.current = false;
+>>>>>>> 9e1f0145 (add(touch): 增加触控状态下(Surface)二次确认关闭的操作，防止误触)
     event.stopPropagation();
     event.preventDefault();
   };
 
+<<<<<<< HEAD
   // 鼠标按在控制按钮上时告诉标题栏「按住中」：按住期间（哪怕指针滑出按钮、滑出顶部）
   // 都不自动收起，松手后按指针最后的位置重新判定，回到正常的自动显隐。
   const releaseHoldRef = useRef<(() => void) | null>(null);
@@ -338,12 +449,20 @@ export default function WindowControls({
   );
 
   useGlass();
+=======
+  // 手势被系统取消（如触摸后滑走、变成滚动）时不会产生 click，别把吞点击的标记留给下一次。
+  const handlePointerCancel = () => {
+    swallowNextClickRef.current = false;
+  };
+
+>>>>>>> 9e1f0145 (add(touch): 增加触控状态下(Surface)二次确认关闭的操作，防止误触)
   return (
     // 外层只负责手势和果冻：data-glass-jelly 的每帧写入会直接改这个节点的 style.transform，
     // 所以 1.5 倍缩放放在里面的 content 层，两个 transform 各写各的，不再互相覆盖。
     // 果冻用「空串 / undefined」开关：布尔值会被 React 渲染成 data-glass-jelly="false"，
     // 属性仍在、选择器照样命中，等于永远开着。只有 undefined 才会真的摘掉属性。
     <div
+<<<<<<< HEAD
       data-glass-jelly={isTitlebarPinned ? "" : undefined}
       ref={rootRef}
       className={`h-full ${
@@ -356,11 +475,20 @@ export default function WindowControls({
       onTouchMove={handleTouchMoveFallback}
       onTouchEnd={handleTouchEndFallback}
       onTouchCancel={handleTouchEndFallback}
+=======
+      ref={rootRef}
+      className={`flex h-full origin-top-right transition-transform duration-200 ${
+        isDaylight ? "text-zinc-800" : "text-[var(--text-primary)]"
+      }`}
+      onPointerDown={handlePointerDown}
+      onPointerCancel={handlePointerCancel}
+>>>>>>> 9e1f0145 (add(touch): 增加触控状态下(Surface)二次确认关闭的操作，防止误触)
       onClickCapture={handleClickCapture}
       style={
         {
           WebkitAppRegion: "no-drag",
           pointerEvents: "none",
+          transform: isTouchMode ? "scale(1.5)" : undefined,
         } as React.CSSProperties
       }
     >
