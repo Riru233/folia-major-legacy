@@ -227,7 +227,7 @@ const AppShell: React.FC<AppShellProps> = ({
               }`}
               style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
             >
-              <button
+              {/* <button
                 type="button"
                 aria-label={
                   isMainWindowClickThroughEnabled
@@ -259,7 +259,7 @@ const AppShell: React.FC<AppShellProps> = ({
                 ) : (
                   <LockOpen size={14} />
                 )}
-              </button>
+              </button> */}
             </div>
             <div className="pointer-events-auto absolute top-0 right-0 z-10 h-full">
               <WindowControls

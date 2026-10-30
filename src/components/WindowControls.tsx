@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { usePlayerChromeSettingsStore } from "../stores/usePlayerChromeSettingsStore";
 import { useAppChromeStore } from "../stores/useAppChromeStore";
+import { useGlass } from "@/shinoinject/useGlass";
 
 export default function WindowControls({
   revealed,
@@ -146,25 +147,25 @@ export default function WindowControls({
 
   const remoteControlVisible = revealed && !isMainWindowClickThroughEnabled;
   const standardControlsVisible = revealed && !isMainWindowClickThroughEnabled;
-  const remoteBtnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] transition-allborder-y bg-[#73757aaa] hover:bg-[#307aa9aa] border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
+  const remoteBtnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] mr-[1px] transition-all bg-[linear-gradient(135deg,#fffa_20%,transparent)] hover:bg-[#307aa9] border-[1px] border-[#fffa] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.5)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
     remoteControlVisible
       ? isDaylight
-        ? "pointer-events-auto opacity-85 translate-y-0 hover:opacity-100"
-        : "pointer-events-auto opacity-75 translate-y-0 hover:opacity-100"
+        ? "pointer-events-auto translate-y-0"
+        : "pointer-events-auto translate-y-0"
       : "pointer-events-none opacity-0 -translate-y-1"
   }`;
-  const btnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] bg-[#73757aaa] hover:bg-[#307aa9aa] transition-all border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
+  const btnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] mr-[1px] bg-[linear-gradient(135deg,#fffa_20%,transparent)] hover:bg-[#307aa9] transition-all border-[1px] border-[#fffa] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.5)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
     standardControlsVisible
       ? isDaylight
-        ? "pointer-events-auto opacity-85 translate-y-0 hover:opacity-100"
-        : "pointer-events-auto opacity-75 translate-y-0 hover:opacity-100"
+        ? "pointer-events-auto translate-y-0"
+        : "pointer-events-auto translate-y-0"
       : "pointer-events-none opacity-0 -translate-y-1"
   }`;
-  const closeBtnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] mr-[3px] bg-red-300 transition-all border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
+  const closeBtnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] mr-[3px] bg-[linear-gradient(135deg,#a97874aa_20%,#cc361ccc)] hover:bg-[#cc361c] transition-all border-[1px] border-[#fffa] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.5)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
     standardControlsVisible
       ? isDaylight
-        ? "pointer-events-auto opacity-85 translate-y-0 hover:opacity-100 hover:bg-red-600"
-        : "pointer-events-auto opacity-75 translate-y-0 hover:opacity-100 hover:bg-red-600"
+        ? "pointer-events-auto translate-y-0"
+        : "pointer-events-auto translate-y-0"
       : "pointer-events-none opacity-0 -translate-y-1"
   }`;
 
@@ -192,7 +193,7 @@ export default function WindowControls({
   const handlePointerCancel = () => {
     swallowNextClickRef.current = false;
   };
-
+  useGlass();
   return (
     <div
       ref={rootRef}
@@ -211,15 +212,17 @@ export default function WindowControls({
       }
     >
       <button
+        data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
         className={remoteBtnClass}
         title={t("ui.remoteControl")}
         tabIndex={remoteControlVisible ? 0 : -1}
         onClick={() => void electron.openRemoteControl?.()}
       >
-        <Radio size={15} />
+        <Radio className="drop-shadow-[0_0_1px_#000]" size={15} />
       </button>
       {!hideFullscreenButton && (
         <button
+          data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
           className={btnClass}
           tabIndex={standardControlsVisible ? 0 : -1}
           title={t(isFullscreen ? "ui.exitFullscreen" : "ui.enterFullscreen")}
@@ -228,17 +231,19 @@ export default function WindowControls({
           )}
           onClick={() => void electron.toggleFullscreenWindow()}
         >
-          {isFullscreen ? <Minimize size={13} /> : <Maximize size={13} />}
+          {isFullscreen ? <Minimize className="drop-shadow-[0_0_1px_#000]" size={13} /> : <Maximize className="drop-shadow-[0_0_1px_#000]" size={13} />}
         </button>
       )}
       <button
+        data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
         className={btnClass}
         tabIndex={standardControlsVisible ? 0 : -1}
         onClick={() => electron.minimizeWindow()}
       >
-        <Minus size={16} />
+        <Minus className="drop-shadow-[0_0_1px_#000]" size={16} />
       </button>
       <button
+        data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
         className={btnClass}
         tabIndex={standardControlsVisible ? 0 : -1}
         title={t(
@@ -270,22 +275,23 @@ export default function WindowControls({
       >
         {usesNativeFullscreen ? (
           isExpanded ? (
-            <Minimize size={13} />
+            <Minimize className="drop-shadow-[0_0_1px_#000]" size={13} />
           ) : (
-            <Maximize size={13} />
+            <Maximize className="drop-shadow-[0_0_1px_#000]" size={13} />
           )
         ) : isExpanded ? (
-          <Copy size={13} />
+          <Copy className="drop-shadow-[0_0_1px_#000]" size={13} />
         ) : (
-          <Square size={13} />
+          <Square className="drop-shadow-[0_0_1px_#000]" size={13} />
         )}
       </button>
       <button
+        data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
         className={closeBtnClass}
         tabIndex={standardControlsVisible ? 0 : -1}
         onClick={() => electron.closeWindow()}
       >
-        <X size={16} />
+        <X className="drop-shadow-[0_0_1px_#000]" size={16} />
       </button>
     </div>
   );
