@@ -3,21 +3,21 @@ import raindropSpriteUrl from './nebbiaRaindrop.png';
 import { makeTex, type NebbiaUniforms, type Tex } from './nebbiaGlUtils';
 import { canRenderFogToFloat, NebbiaProgramBuild } from './nebbiaPrograms';
 import { NebbiaBuildingCache } from './nebbiaBuildingCache';
+import { NebbiaFogGl } from './nebbiaFogGl';
 import { NebbiaMaskGl } from './nebbiaMaskGl';
 import type { NebbiaSegments } from './nebbiaSegments';
 
 // src/components/visualizer/nebbia/nebbiaGl.ts
 // 雾笺的 WebGL2 部分：雾的预渲染和主画面两个全屏着色器，四张玻璃上的纹理（擦痕遮罩（nebbiaMaskGl.ts 每帧画）、擦痕边 / 雨点的水珠、雾上的凝结水珠、哈气的白气），
-// 两张雾的预渲染（RGBA16F，1/4 画布分辨率，各一个 FBO、一层画一次；不支持浮点渲染目标时主画面自己算）。
+// 雾的预渲染（nebbiaFogGl.ts，RGBA16F，1/4、1/8 画布分辨率；不支持浮点渲染目标时主画面自己算），
+// 窗外楼群的缓存（nebbiaBuildingCache.ts，采样单元 9–14，雾的预渲染和主画面从它取楼群）。
 // 着色器在后台编（nebbiaPrograms.ts）：`ready` 为真之前不画。
 // 水珠精灵是 raindrop-fx 1.0.8（MIT，见 nebbiaRaindrop.LICENSE.txt）的 assets/img/raindrop.png。
 
 type Locations = Record<string, WebGLUniformLocation | null>;
 
-// 两层雾的模糊半径（屏高的比例）
-const FOG_BLUR = [0.03, 0.09];
 // 街景（两个程序都有）读的 uniform；其余只在主画面
-const SCENE_UNIFORMS = ['uRes', 'uSceneShift', 'uTime', 'uBus', 'uNeon', 'uSky0', 'uSky1', 'uLa', 'uLb', 'uLc', 'uSpotSrc', 'uSpotSrc2', 'uSpotTgt', 'uSpotR', 'uSpotI'];
+const SCENE_UNIFORMS = ['uRes', 'uSceneShift', 'uTime', 'uBus', 'uNeon', 'uSky0', 'uSky1', 'uLa', 'uLb', 'uLc', 'uSpotSrc', 'uSpotSrc2', 'uSpotTgt', 'uSpotR', 'uSpotI', 'uBldOn', 'uBldGeo'];
 const MAIN_UNIFORMS = [...SCENE_UNIFORMS, 'uMist', 'uEdge', 'uRefract', 'uGlint', 'uGlassShift', 'uBreathOn', 'uBreathThick'];
 
 const locate = (gl: WebGL2RenderingContext, prog: WebGLProgram, names: string[]): Locations => (
@@ -39,10 +39,8 @@ export class NebbiaGl {
     private readonly mask: NebbiaMaskGl; private readonly drop: Tex; private readonly field: Tex; private readonly sprite: Tex; private readonly breath: Tex;
     /** 楼群缓存：主程序编好之后才有。 */
     private bld: NebbiaBuildingCache | null = null;
-    private readonly fogTex: Tex[];
-    private readonly fogOK: boolean;
-    private readonly fogFbs: WebGLFramebuffer[] = [];
-    private fogW = 1; private fogH = 1;
+    /** 雾的预渲染（两层各一张纹理，1/4 与 1/8 画布分辨率）。 */
+    private fogGl: NebbiaFogGl | null = null;
     private W = 1; private H = 1;
     private spriteReady = false;
     private instData = new Float32Array(0);
@@ -55,8 +53,9 @@ export class NebbiaGl {
         const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, preserveDrawingBuffer: false });
         if (!gl) throw new Error('Nebbia: WebGL2 unavailable');
         this.gl = gl;
-        this.fogOK = canRenderFogToFloat(gl);
-        this.build = new NebbiaProgramBuild(gl, this.fogOK);
+        // 能不能把雾预渲染到浮点纹理：决定雾的程序有没有、主画面用哪一版着色器
+        const fogOK = canRenderFogToFloat(gl);
+        this.build = new NebbiaProgramBuild(gl, fogOK);
         this.quadVao = gl.createVertexArray()!;
         gl.bindVertexArray(this.quadVao);
         gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
@@ -68,9 +67,8 @@ export class NebbiaGl {
         this.drop = makeTex(gl, 3);
         this.field = makeTex(gl, 4);
         this.sprite = makeTex(gl, 5);
-        this.fogTex = [makeTex(gl, 6), makeTex(gl, 7)];
+        this.fogGl = new NebbiaFogGl(gl, 6);
         this.breath = makeTex(gl, 8);
-        if (this.fogOK) for (let i = 0; i < 2; i += 1) this.fogFbs.push(gl.createFramebuffer()!);
 
         this.spriteVao = gl.createVertexArray()!;
         gl.bindVertexArray(this.spriteVao);
@@ -98,7 +96,7 @@ export class NebbiaGl {
         const { main, fog, sprite } = this.build.programs;
         this.U = locate(gl, main, MAIN_UNIFORMS);
         gl.useProgram(main);
-        const samplers: [string, Tex][] = [['uMask', this.mask.tex], ['uDrop', this.drop], ['uField', this.field], ['uFogBlur', this.fogTex[0]], ['uFogGlow', this.fogTex[1]], ['uBreath', this.breath]];
+        const samplers: [string, Tex][] = [['uMask', this.mask.tex], ['uDrop', this.drop], ['uField', this.field], ['uFogBlur', this.fogGl!.textures[0]], ['uFogGlow', this.fogGl!.textures[1]], ['uBreath', this.breath]];
         for (const [name, tex] of samplers) gl.uniform1i(gl.getUniformLocation(main, name), tex.unit);
         gl.uniform1f(this.U.uBreathThick, NEBBIA_FIXED.breathThick);
         // 楼群缓存的取样器与补画用的 uniform 都在主程序上；缓存要主程序编好之后才建得起来
@@ -163,18 +161,8 @@ export class NebbiaGl {
             gl.bindFramebuffer(gl.FRAMEBUFFER, tex.fb);
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex.t, 0);
         }
-        // 帧缓冲能不能拼起来在建上下文时已经试过（canRenderFogToFloat），这里不再同步查状态
-        if (this.fogOK) {
-            this.fogW = Math.max(1, Math.ceil(this.canvas.width / FOG_DIV));
-            this.fogH = Math.max(1, Math.ceil(this.canvas.height / FOG_DIV));
-            this.fogTex.forEach((tex, i) => {
-                gl.activeTexture(gl.TEXTURE0 + tex.unit);
-                gl.bindTexture(gl.TEXTURE_2D, tex.t);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, this.fogW, this.fogH, 0, gl.RGBA, gl.HALF_FLOAT, null);
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.fogFbs[i]);
-                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex.t, 0);
-            });
-        }
+        // 雾的预渲染：两层各一个单附件的帧缓冲，1/4 与 1/8 画布分辨率（nebbiaFogGl.ts）
+        this.fogGl?.resize(this.canvas.width, this.canvas.height);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         // 楼群缓存的尺寸跟着画布走；它要主程序编好才建得起来
         this.bld?.resize(this.canvas.width, this.canvas.height, Math.max(1, Math.ceil(this.canvas.height / FOG_DIV)));
@@ -241,13 +229,7 @@ export class NebbiaGl {
             // 预渲染不采样任何纹理，画进雾纹理不会和主画面的采样单元成反馈环
             gl.useProgram(fog);
             this.setScene(this.F, u);
-            gl.viewport(0, 0, this.fogW, this.fogH);
-            FOG_BLUR.forEach((b, i) => {
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.fogFbs[i]);
-                gl.uniform1f(this.uFogB, b);
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            });
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            this.fogGl?.draw(fog, this.uFogB);
         }
         gl.useProgram(main);
         this.setScene(U, u);
