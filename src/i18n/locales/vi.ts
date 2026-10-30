@@ -1014,6 +1014,8 @@ export default {
     "exitFullscreen": "Thoát toàn màn hình",
     "maximizeWindow": "Phóng to",
     "restoreWindow": "Khôi phục cửa sổ",
+    "pinWindowControls": "Ghim thanh điều khiển cửa sổ",
+    "unpinWindowControls": "Bỏ ghim thanh điều khiển cửa sổ",
     "remoteControl": "Điều khiển từ xa",
     "seek": "Tua",
     "clearActiveCommand": "Xóa lệnh hiện tại",

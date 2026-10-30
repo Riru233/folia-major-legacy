@@ -1014,6 +1014,8 @@ export default {
     "exitFullscreen": "退出全屏",
     "maximizeWindow": "最大化",
     "restoreWindow": "还原窗口",
+    "pinWindowControls": "固定窗口控制栏",
+    "unpinWindowControls": "取消固定窗口控制栏",
     "remoteControl": "远程控制",
     "seek": "定位",
     "clearActiveCommand": "清除当前命令",

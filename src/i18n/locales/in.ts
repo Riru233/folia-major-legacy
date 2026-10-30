@@ -1014,6 +1014,8 @@ export default {
     "exitFullscreen": "Keluar layar penuh",
     "maximizeWindow": "Maksimalkan",
     "restoreWindow": "Pulihkan jendela",
+    "pinWindowControls": "Sematkan tombol kontrol jendela",
+    "unpinWindowControls": "Lepas sematan tombol kontrol jendela",
     "remoteControl": "Remote control",
     "seek": "Cari",
     "clearActiveCommand": "Bersihkan perintah aktif",

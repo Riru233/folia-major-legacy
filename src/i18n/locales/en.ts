@@ -1014,6 +1014,8 @@ export default {
     "exitFullscreen": "Exit fullscreen",
     "maximizeWindow": "Maximize",
     "restoreWindow": "Restore window",
+    "pinWindowControls": "Pin window controls",
+    "unpinWindowControls": "Unpin window controls",
     "remoteControl": "Remote control",
     "seek": "Seek",
     "clearActiveCommand": "Clear active command",
