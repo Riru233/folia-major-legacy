@@ -212,7 +212,7 @@ export default function WindowControls({
       }
     >
       <button
-        data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
+        data-glass data-glass-jelly data-glass-light data-glass-strength="0.8" data-glass-blur="1" data-glass-bend="5"
         className={remoteBtnClass}
         title={t("ui.remoteControl")}
         tabIndex={remoteControlVisible ? 0 : -1}
@@ -222,7 +222,7 @@ export default function WindowControls({
       </button>
       {!hideFullscreenButton && (
         <button
-          data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
+          data-glass data-glass-jelly data-glass-light data-glass-strength="0.8" data-glass-blur="1" data-glass-bend="5"
           className={btnClass}
           tabIndex={standardControlsVisible ? 0 : -1}
           title={t(isFullscreen ? "ui.exitFullscreen" : "ui.enterFullscreen")}
@@ -235,7 +235,7 @@ export default function WindowControls({
         </button>
       )}
       <button
-        data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
+        data-glass data-glass-jelly data-glass-light data-glass-strength="0.8" data-glass-blur="1" data-glass-bend="5"
         className={btnClass}
         tabIndex={standardControlsVisible ? 0 : -1}
         onClick={() => electron.minimizeWindow()}
@@ -243,7 +243,7 @@ export default function WindowControls({
         <Minus className="drop-shadow-[0_0_1px_#000]" size={16} />
       </button>
       <button
-        data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
+        data-glass data-glass-jelly data-glass-light data-glass-strength="0.8" data-glass-blur="1" data-glass-bend="5"
         className={btnClass}
         tabIndex={standardControlsVisible ? 0 : -1}
         title={t(
@@ -286,7 +286,7 @@ export default function WindowControls({
         )}
       </button>
       <button
-        data-glass data-glass-strength="1" data-glass-blur="1" data-glass-bend="10"
+        data-glass data-glass-jelly data-glass-light data-glass-strength="0.8" data-glass-blur="1" data-glass-bend="5"
         className={closeBtnClass}
         tabIndex={standardControlsVisible ? 0 : -1}
         onClick={() => electron.closeWindow()}
