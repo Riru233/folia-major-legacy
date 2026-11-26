@@ -1741,7 +1741,7 @@ export default {
     "ponder": "思索帮助页",
     "ponderDescription": "了解 Folia 的基本操作与运行逻辑",
     "version": "版本",
-    "ltsc": "该版本为长期维护的Legacy分支版本，不增加额外的其他新功能"
+    "ltsc": "该版本最后维护于2026/11/27"
   },
   "qishui": { "recentPlayed": "汽水最近播放", "recommended": "为你推荐" },
   "lyricProvider": {

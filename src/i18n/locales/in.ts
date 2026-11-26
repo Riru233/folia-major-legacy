@@ -1741,7 +1741,7 @@ export default {
     "ponder": "Ponder Bantuan",
     "ponderDescription": "Pelajari kontrol dasar dan cara kerja Folia",
     "version": "Versi",
-    "ltsc": "Ini adalah versi cabang Legacy yang dipelihara jangka panjang, tanpa menambahkan fitur baru lainnya"
+    "ltsc": "Versi ini terakhir dipelihara pada 27/11/2026"
   },
   "qishui": { "recentPlayed": "Terakhir diputar di Qishui", "recommended": "Rekomendasi untuk Anda" },
   "lyricProvider": {
