@@ -1740,7 +1740,8 @@ export default {
     "majorUpdateLabel": "{{codename}} Update · Major update",
     "ponder": "Ponder Help",
     "ponderDescription": "Learn Folia's basic controls and operating model",
-    "version": "Version"
+    "version": "Version",
+    "ltsc": "This is a long-term maintained Legacy branch version with no additional new features"
   },
   "qishui": { "recentPlayed": "Recently played on Qishui", "recommended": "Recommended for you" },
   "lyricProvider": {

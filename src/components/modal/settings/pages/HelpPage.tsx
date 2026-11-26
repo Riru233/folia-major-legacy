@@ -22,8 +22,8 @@ import { iconLabel } from './iconLabel';
 
 const REPOSITORY_URL = 'https://github.com/chthollyphile/folia-major';
 const REPOSITORY_NAME = 'chthollyphile/folia-major';
-const SHINO_REPOSITORY_URL = 'https://github.com/Riru233/folia-major';
-const SHINO_REPOSITORY_NAME = 'Riru233/folia-major';
+const SHINO_REPOSITORY_URL = 'https://github.com/Riru233/folia-major-legacy';
+const SHINO_REPOSITORY_NAME = 'Riru233/folia-major-legacy';
 const BUILD_KIND = getBuildKind();
 const VERSION_INFO = (__DOCKER_STACK_VERSION__
     ? `${__APP_VERSION_LABEL__} v${__APP_VERSION__} · Stack ${__DOCKER_STACK_VERSION__} · ${__COMMIT_HASH__}`
@@ -105,13 +105,6 @@ const HelpPage: React.FC<HelpPageProps> = ({ onOpenReleaseNotes, onOpenAiHelp, o
         <>
             <div className={`${COLUMNS_CLASS} mt-5 gap-y-3`}>
                 <Tile
-                    testId="help-release-notes"
-                    icon={Sparkles}
-                    title={t('help.releaseNotes')}
-                    line={t('help.releaseNotesDescription')}
-                    onClick={onOpenReleaseNotes}
-                />
-                <Tile
                     testId="help-page-ponder"
                     icon={Lightbulb}
                     title={t('help.ponder')}
@@ -164,6 +157,9 @@ const HelpPage: React.FC<HelpPageProps> = ({ onOpenReleaseNotes, onOpenAiHelp, o
                 {BUILD_KIND !== 'official' && (
                     <Row sub notice={t(BUILD_KIND === 'unofficial' ? 'options.unofficialBuildNotice' : 'options.selfHostedBuildNotice')} />
                 )}
+                
+                <Row label={t('help.ltsc')}>
+                </Row>
                 <FoundUpdateRow sub />
                 <Row
                     label={(
@@ -180,6 +176,7 @@ const HelpPage: React.FC<HelpPageProps> = ({ onOpenReleaseNotes, onOpenAiHelp, o
                         <ExternalLink size={12} />
                     </Button>
                 </Row>
+                
             </Group>
         </>
     );

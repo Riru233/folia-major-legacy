@@ -1740,7 +1740,8 @@ export default {
     "majorUpdateLabel": "Cập nhật {{codename}} · Bản cập nhật lớn",
     "ponder": "Trợ giúp Khám phá",
     "ponderDescription": "Tìm hiểu thao tác cơ bản và cơ chế vận hành của Folia",
-    "version": "phiên bản"
+    "version": "phiên bản",
+    "ltsc": "Đây là phiên bản nhánh Legacy được bảo trì dài hạn, không bổ sung thêm tính năng mới"
   },
   "qishui": { "recentPlayed": "Gần đây đã phát trên Qishui", "recommended": "Được đề xuất cho bạn" },
   "lyricProvider": {

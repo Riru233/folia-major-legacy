@@ -1740,7 +1740,8 @@ export default {
     "majorUpdateLabel": "{{codename}} Update · Pembaruan besar",
     "ponder": "Ponder Bantuan",
     "ponderDescription": "Pelajari kontrol dasar dan cara kerja Folia",
-    "version": "Versi"
+    "version": "Versi",
+    "ltsc": "Ini adalah versi cabang Legacy yang dipelihara jangka panjang, tanpa menambahkan fitur baru lainnya"
   },
   "qishui": { "recentPlayed": "Terakhir diputar di Qishui", "recommended": "Rekomendasi untuk Anda" },
   "lyricProvider": {

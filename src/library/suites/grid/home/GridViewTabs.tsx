@@ -45,7 +45,7 @@ export const GridViewTabs: React.FC<GridViewTabsProps> = ({ tabs, isDaylight, on
     const chrome = gridChromeClassesFor(isDaylight);
     useGlass();
     return (
-        <div data-glass  className={`pointer-events-auto flex h-7 items-center rounded-full p-0.5 ${isDaylight ? "border-y border-white/[0.32] bg-[#fff]" : "border-y border-white/[0.22] bg-[#fff]"} shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)]`}>
+        <div data-glass  className={`pointer-events-auto flex h-7 items-center rounded-full p-0.5 ${isDaylight ? "border-y border-white/[0.32] bg-[#fff4]" : "border-y border-white/[0.22] bg-[#0004]"} shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)]`}>
             {onOpenMap && (
                 <button
                     type="button"

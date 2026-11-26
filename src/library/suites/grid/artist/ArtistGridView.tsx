@@ -1317,18 +1317,43 @@ const ArtistGridView: React.FC<ArtistGridViewProps> = ({
                     // 返回按钮表示看完了（onDone）：宿主清掉浏览会话、让每套 suite 忘掉布局记录，再返回
                     // （Escape 与浏览器后退保留）。P4.5 起这条语义在宿主，不在这里清。
                     onClick={onDone}
-                    className={`w-10 h-10 rounded-full ${closeBtnBg} flex items-center justify-center transition-colors backdrop-blur-md cursor-pointer`}
-                    style={{ color: 'var(--text-primary)' }}
+                    data-glass data-glass-light data-glass-jelly
+                    className={`w-12 h-12 rounded-full ${closeBtnBg} flex items-center justify-center transition-colors cursor-pointer`}
+                    style={{ color: 'var(--text-primary)',
+                            backgroundColor: isDaylight
+                            ? "rgba(255,255,255,0.4)"
+                            : "rgba(0,0,0,0.4)",
+                            borderTop: isDaylight
+                            ? "1px solid rgba(255,255,255,0.32)"
+                            : "1px solid rgba(255,255,255,0.22)",
+                            borderBottom: isDaylight
+                            ? "1px solid rgba(255,255,255,0.32)"
+                            : "1px solid rgba(255,255,255,0.22)",
+                            outline: "none",
+                            boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)"}}
                 >
                     <ChevronLeft size={20} />
                 </button>
                 {offers('enqueue-scope') && (
                     <button
+                        data-glass data-glass-light data-glass-jelly
                         type="button"
                         onClick={() => artistActions.enqueueScope()}
                         disabled={!capabilities['enqueue-scope'].enabled}
-                        className={`h-10 w-10 sm:w-auto sm:px-4 rounded-full ${closeBtnBg} flex items-center justify-center gap-1.5 text-xs font-semibold transition-colors backdrop-blur-md cursor-pointer disabled:opacity-40 disabled:cursor-default`}
-                        style={{ color: 'var(--text-primary)' }}
+                        className={`h-12 w-12 sm:w-auto sm:px-4 rounded-full ${closeBtnBg} flex items-center justify-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default`}
+                        style={{ color: 'var(--text-primary)',
+                            backgroundColor: isDaylight
+                            ? "rgba(255,255,255,0.4)"
+                            : "rgba(0,0,0,0.4)",
+                            borderTop: isDaylight
+                            ? "1px solid rgba(255,255,255,0.32)"
+                            : "1px solid rgba(255,255,255,0.22)",
+                            borderBottom: isDaylight
+                            ? "1px solid rgba(255,255,255,0.32)"
+                            : "1px solid rgba(255,255,255,0.22)",
+                            outline: "none",
+                            boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
+                         }}
                         title={t('artistGrid.addTopSongsToQueue')}
                         aria-label={t('artistGrid.addTopSongsToQueue')}
                     >
@@ -1346,11 +1371,21 @@ const ArtistGridView: React.FC<ArtistGridViewProps> = ({
                     setShowCutInPanel(current => !current);
                 }}
                 data-glass
-        data-glass-jelly data-glass-light
-                className="group/grid-title absolute left-1/2 top-5 -translate-x-1/2 z-[70] text-center flex flex-col items-center select-none cursor-pointer hover:scale-[1.01] active:scale-98 transition-all px-5 py-2 rounded-2xl backdrop-blur-md"
+                data-glass-jelly data-glass-light
+                className="group/grid-title absolute left-1/2 top-5 -translate-x-1/2 z-[70] text-center flex flex-col items-center select-none cursor-pointer hover:scale-[1.01] active:scale-98 transition-all px-5 py-2 rounded-2xl"
                 style={{
-                    backgroundColor: 'color-mix(in srgb, var(--bg-color) 20%, transparent)',
                     color: 'var(--text-primary)',
+                    backgroundColor: isDaylight
+                    ? "rgba(255,255,255,0.4)"
+                    : "rgba(0,0,0,0.4)",
+                    borderTop: isDaylight
+                    ? "1px solid rgba(255,255,255,0.32)"
+                    : "1px solid rgba(255,255,255,0.22)",
+                    borderBottom: isDaylight
+                    ? "1px solid rgba(255,255,255,0.32)"
+                    : "1px solid rgba(255,255,255,0.22)",
+                    outline: "none",
+                    boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
                 }}
             >
                 <button
