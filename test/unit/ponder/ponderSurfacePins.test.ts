@@ -57,7 +57,7 @@ const drawingOf = (kind: PonderSurfaceKind | undefined) => {
             kind,
             accent: '#ff3366',
             line: 'rgba(255,255,255,0.1)',
-            outline: 'rgba(255,255,255,0.32)',
+            outline: 'rgba(255,255,255,0.42)',
         }),
     );
     return `${markup.length} ${createHash('sha256').update(markup).digest('hex').slice(0, 16)}`;

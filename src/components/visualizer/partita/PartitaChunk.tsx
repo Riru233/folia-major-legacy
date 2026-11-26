@@ -84,7 +84,7 @@ export const PartitaChunk: React.FC<{
                             bottom: '-16px',
                             height: '32px',
                             transformOrigin: 'bottom',
-                            backgroundColor: chunkStatus === 'active' ? activeColor : chunkStatus === 'passed' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.14)',
+                            backgroundColor: chunkStatus === 'active' ? activeColor : chunkStatus === 'passed' ? 'rgba(255,255,255,0.47)' : 'rgba(255,255,255,0.14)',
                             boxShadow: chunkStatus === 'active' ? `0 0 10px ${activeColor}45` : 'none',
                         }}
                         animate={{
@@ -104,7 +104,7 @@ export const PartitaChunk: React.FC<{
                             bottom: '-8px',
                             width: 'calc(100% + 36px)',
                             transformOrigin: 'left',
-                            backgroundColor: chunkStatus === 'active' ? activeColor : chunkStatus === 'passed' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.14)',
+                            backgroundColor: chunkStatus === 'active' ? activeColor : chunkStatus === 'passed' ? 'rgba(255,255,255,0.47)' : 'rgba(255,255,255,0.14)',
                             boxShadow: chunkStatus === 'active' ? `0 0 10px ${activeColor}35` : 'none',
                         }}
                         animate={{
@@ -128,7 +128,7 @@ export const PartitaChunk: React.FC<{
                             bottom: '-16px',
                             height: '32px',
                             transformOrigin: 'bottom',
-                            backgroundColor: chunkStatus === 'active' ? activeColor : chunkStatus === 'passed' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.14)',
+                            backgroundColor: chunkStatus === 'active' ? activeColor : chunkStatus === 'passed' ? 'rgba(255,255,255,0.47)' : 'rgba(255,255,255,0.14)',
                             boxShadow: chunkStatus === 'active' ? `0 0 10px ${activeColor}45` : 'none',
                         }}
                         animate={{
@@ -148,7 +148,7 @@ export const PartitaChunk: React.FC<{
                             bottom: '-8px',
                             width: 'calc(100% + 36px)',
                             transformOrigin: 'right',
-                            backgroundColor: chunkStatus === 'active' ? activeColor : chunkStatus === 'passed' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.14)',
+                            backgroundColor: chunkStatus === 'active' ? activeColor : chunkStatus === 'passed' ? 'rgba(255,255,255,0.47)' : 'rgba(255,255,255,0.14)',
                             boxShadow: chunkStatus === 'active' ? `0 0 10px ${activeColor}35` : 'none',
                         }}
                         animate={{

@@ -284,7 +284,7 @@ export const ExploreScrollbar: React.FC<ExploreScrollbarProps> = ({ list: listRe
                     onKeyDown={onKeyDown}
                     data-glass
                     data-glass-light
-                    className={`pointer-events-auto absolute inset-0 touch-none rounded-full outline-none shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--text-primary)] ${isDaylight ? 'border-y border-white/[0.32] bg-white/35' : 'border-y border-white/[0.22] bg-black/35'}`}
+                    className={`pointer-events-auto absolute inset-0 touch-none rounded-full outline-none shadow-[0px_8px_16px_rgba(40,40,40,0.2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--text-primary)] ${isDaylight ? 'border-y border-white/[0.32] bg-white/35' : 'border-y border-white/[0.22] bg-black/35'}`}
                 >
                     <div
                         ref={thumbRef}

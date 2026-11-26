@@ -968,9 +968,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             return t('options.updateChecking') || 'Checking...';
         }
 
-        if (updateStatus?.availableVersion) {
-            return `${t('options.updateAvailable') || 'Found'} v${updateStatus.availableVersion}`;
-        }
+        // if (updateStatus?.availableVersion) {
+        //     return `${t('options.updateAvailable') || 'Found'} v${updateStatus.availableVersion}`;
+        // }
 
         if (updateStatus?.status === 'latest') {
             return t('options.updateLatest') || 'Up to date';

@@ -216,7 +216,7 @@ const GraphicsPage: React.FC = () => {
                 {GLASS_GPU_BLOCKED && (
                     <Row sub notice={t('options.liquidGlassGpuBlockedNotice')} />
                 )}
-                <Row
+                {/* <Row
                     option={O.glassPreset}
                     disabled={GLASS_GPU_BLOCKED}
                     hint={t('options.liquidGlassPresetDesc')}
@@ -233,7 +233,7 @@ const GraphicsPage: React.FC = () => {
                             format={value => value.toFixed(2)}
                         />
                     </Row>
-                )}
+                )} */}
                 {GLASS_DISTORTION && (
                     <Row option={O.glassBend} disabled={GLASS_GPU_BLOCKED} hint={t('options.liquidGlassBendDesc')}>
                         <Slider

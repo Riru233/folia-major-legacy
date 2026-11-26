@@ -139,7 +139,7 @@ export const useBravaisHomeChrome = ({
         if (hasSettings) tools.push({
             id: 'settings',
             label: t('libraryBravaisHome.settings'),
-            badge: updateAvailable ? t('options.updateAvailable') : undefined,
+            badge: undefined,
             run: () => latest.current.props.onOpenSettings?.('help'),
         });
         return tools;

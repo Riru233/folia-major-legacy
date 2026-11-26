@@ -13,7 +13,7 @@ const renderSurface = (kind: PonderSurfaceKind) => renderToStaticMarkup(
         kind,
         accent: '#ff3366',
         line: 'rgba(255,255,255,0.1)',
-        outline: 'rgba(255,255,255,0.32)',
+        outline: 'rgba(255,255,255,0.42)',
     }),
 );
 

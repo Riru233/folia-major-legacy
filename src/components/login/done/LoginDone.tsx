@@ -265,7 +265,7 @@ type FloodProps = DoneProps & {
 export const LoginDoneFlood: React.FC<FloodProps> = ({ parts, providerId, label, user, surface, tickColour, shown, title, left }) => (
     <div ref={keep(parts, 'flood')} className="absolute inset-0 overflow-hidden text-[color:var(--login-on-pc)]" style={{ visibility: 'hidden' }}>
         {shown && (
-            <div ref={keep(parts, 'surface')} className="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12),inset_0_1px_0_rgba(255,255,255,0.32)]" style={{ background: surface }}>
+            <div ref={keep(parts, 'surface')} className="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12),inset_0_1px_0_rgba(255,255,255,0.42)]" style={{ background: surface }}>
                 <i ref={keep(parts, 'light')} className="absolute inset-0" style={{ opacity: 0 }} />
                 <span
                     ref={keep(parts, 'watermark')}

@@ -59,16 +59,16 @@ export const StatusToast: React.FC<{ toast: AppStatusToast }> = ({ toast }) => {
             data-glass
             style={{
                   backgroundColor: isDaylight
-                    ? "rgba(255,255,255,0.22)"
+                    ? "rgba(255,255,255,0.47)"
                     : "rgba(0, 0, 0, 0.42)",
                   borderTop: isDaylight
-                    ? "1px solid rgba(255,255,255,0.32)"
-                    : "1px solid rgba(255,255,255,0.22)",
+                    ? "1px solid rgba(255,255,255,0.42)"
+                    : "1px solid rgba(255,255,255,0.47)",
                   borderBottom: isDaylight
-                    ? "1px solid rgba(255,255,255,0.32)"
-                    : "1px solid rgba(255,255,255,0.22)",
+                    ? "1px solid rgba(255,255,255,0.42)"
+                    : "1px solid rgba(255,255,255,0.47)",
                   outline: "none",
-                  boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
+                  boxShadow: "0px 8px 16px rgba(40,40,40,0.2)",
                 }}
             ref={toastLayoutRef}
             onUpdate={invalidateLayout}

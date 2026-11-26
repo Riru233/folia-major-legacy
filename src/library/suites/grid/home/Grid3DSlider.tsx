@@ -889,13 +889,13 @@ export const Grid3DSlider: React.FC<Grid3DSliderProps> = ({
                                                 ? "rgba(255,255,255,0.4)"
                                                 : "rgba(0,0,0,0.4)",
                                             borderTop: isDaylight
-                                                ? "1px solid rgba(255,255,255,0.32)"
-                                                : "1px solid rgba(255,255,255,0.22)",
+                                                ? "1px solid rgba(255,255,255,0.42)"
+                                                : "1px solid rgba(255,255,255,0.47)",
                                             borderBottom: isDaylight
-                                                ? "1px solid rgba(255,255,255,0.32)"
-                                                : "1px solid rgba(255,255,255,0.22)",
+                                                ? "1px solid rgba(255,255,255,0.42)"
+                                                : "1px solid rgba(255,255,255,0.47)",
                                             outline: "none",
-                                            boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
+                                            boxShadow: "0px 8px 16px rgba(40,40,40,0.2)",
                                             color: 'var(--text-primary)',
                                         };
                                         const renderCardBody = (reflection = false) => (

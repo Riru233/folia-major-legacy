@@ -244,13 +244,13 @@ const VisualizerShell = forwardRef<HTMLDivElement, VisualizerShellProps>(({
                             ? "#333a"
                             : "#fffa",
                         borderTop: resolvedIsDaylight
-                            ? "1px solid rgba(255,255,255,0.32)"
-                            : "1px solid rgba(255,255,255,0.22)",
+                            ? "1px solid rgba(255,255,255,0.42)"
+                            : "1px solid rgba(255,255,255,0.47)",
                         borderBottom: resolvedIsDaylight
-                            ? "1px solid rgba(255,255,255,0.32)"
-                            : "1px solid rgba(255,255,255,0.22)",
+                            ? "1px solid rgba(255,255,255,0.42)"
+                            : "1px solid rgba(255,255,255,0.47)",
                         outline: "none",
-                        boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
+                        boxShadow: "0px 8px 16px rgba(40,40,40,0.2)",
                     }}
                     className="absolute top-6 left-6 z-30 h-12 w-12 rounded-full flex items-center justify-center transition-colors backdrop-blur-md bg-black/20 hover:bg-white/10 text-white/60 pointer-events-auto"
                 >

@@ -146,21 +146,21 @@ export default function WindowControls({
 
   const remoteControlVisible = revealed && !isMainWindowClickThroughEnabled;
   const standardControlsVisible = revealed && !isMainWindowClickThroughEnabled;
-  const remoteBtnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] transition-allborder-y bg-[#73757aaa] hover:bg-[#307aa9aa] border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
+  const remoteBtnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] transition-allborder-y bg-[#73757aaa] hover:bg-[#307aa9aa] border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[0px_8px_16px_rgba(40,40,40,0.2)] ${
     remoteControlVisible
       ? isDaylight
         ? "pointer-events-auto opacity-85 translate-y-0 hover:opacity-100"
         : "pointer-events-auto opacity-75 translate-y-0 hover:opacity-100"
       : "pointer-events-none opacity-0 -translate-y-1"
   }`;
-  const btnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] bg-[#73757aaa] hover:bg-[#307aa9aa] transition-all border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
+  const btnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] bg-[#73757aaa] hover:bg-[#307aa9aa] transition-all border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[0px_8px_16px_rgba(40,40,40,0.2)] ${
     standardControlsVisible
       ? isDaylight
         ? "pointer-events-auto opacity-85 translate-y-0 hover:opacity-100"
         : "pointer-events-auto opacity-75 translate-y-0 hover:opacity-100"
       : "pointer-events-none opacity-0 -translate-y-1"
   }`;
-  const closeBtnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] mr-[3px] bg-red-300 transition-all border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)] ${
+  const closeBtnClass = `flex items-center justify-center w-9 h-[calc(100% - 6px)] mb-[6px] mr-[3px] bg-red-300 transition-all border-y-[#666] border-solid duration-200 text-white outline outline-1 outline-solid outline-[rgba(40,40,40,0.6)] shadow-[0px_8px_16px_rgba(40,40,40,0.2)] ${
     standardControlsVisible
       ? isDaylight
         ? "pointer-events-auto opacity-85 translate-y-0 hover:opacity-100 hover:bg-red-600"

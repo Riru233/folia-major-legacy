@@ -7,7 +7,7 @@ const SVGNS = "http://www.w3.org/2000/svg";
 // 默认参数：出厂值就是这里，设置面板（useLiquidGlassSettingsStore）的兜底也读它。
 // bend = 最大弯曲距离：边缘受折射的区域从边缘向中心延伸多少 px，平面（不受折射）区在中心，bend 越大平面越小。
 // ★ 配置位置①：默认弯曲距离（px）。测试直接改下行的 bend 数字，或给元素加 data-glass-bend="80" 单元素覆盖。
-const global = { strength: 2.25, blur: 2, sat: 180, bend: 60 };
+const global = { strength: 2.25, blur: 2, sat: 180, bend: 10 };
 export type LiquidGlassParams = typeof global;
 export const LIQUID_GLASS_DEFAULTS: LiquidGlassParams = { ...global };
 // 边缘扭曲（位移滤镜）与饱和度需要 backdrop-filter 能引用 SVG 位移图：Chromium 内核画得了，
