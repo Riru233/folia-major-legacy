@@ -55,8 +55,8 @@ const PinnedCommandRow: React.FC<PinnedCommandRowProps> = ({
             style={{
               backgroundColor: "#0004",
               color: "#fffa",
-              borderTop: "1px solid rgba(255,255,255,0.12)",
-              borderBottom: "1px solid rgba(255,255,255,0.12)",
+              borderTop: "1px solid rgba(255,255,255,0.22)",
+              borderBottom: "1px solid rgba(255,255,255,0.22)",
               outline: "1px solid rgba(148, 148, 148, 0.2)",
               boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
             }}

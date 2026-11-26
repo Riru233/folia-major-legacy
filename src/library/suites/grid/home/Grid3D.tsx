@@ -557,15 +557,15 @@ export const Grid3D: React.FC<Grid3DProps> = (props) => {
                             className={`relative flex items-center gap-1.5 p-2.5 rounded-full hover:bg-white/10 transition-all ml-4 w-[40px] h-[40px]`}
                             style={{
                                 backgroundColor: isDaylight
-                                ? "rgba(255,255,255,0.42)"
+                                ? "rgba(255,255,255,0.22)"
                                 : "rgba(0, 0, 0, 0.42)",
                                 borderTop: isDaylight
-                                ? "1px solid rgba(0,0,0,0.08)"
-                                : "1px solid rgba(255,255,255,0.12)",
+                                ? "1px solid rgba(255,255,255,0.32)"
+                                : "1px solid rgba(255,255,255,0.22)",
                                 borderBottom: isDaylight
-                                ? "1px solid rgba(0,0,0,0.08)"
-                                : "1px solid rgba(255,255,255,0.12)",
-                                outline: "1px solid rgba(40,40,40,0.2)",
+                                ? "1px solid rgba(255,255,255,0.32)"
+                                : "1px solid rgba(255,255,255,0.22)",
+                                outline: "none",
                                 boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
                                 ...headerFadeStyle,
                             }}
@@ -591,15 +591,15 @@ export const Grid3D: React.FC<Grid3DProps> = (props) => {
                 className={`group relative inline-flex items-center justify-center p-2.5 rounded-full text-xs md:text-sm font-medium transition-colors duration-300 whitespace-nowrap ${navPillInactiveText} min-w-[40px] h-[40px]`}
                 style={{
                   backgroundColor: isDaylight
-                    ? "rgba(255,255,255,0.42)"
+                    ? "rgba(255,255,255,0.22)"
                     : "rgba(0, 0, 0, 0.42)",
                   borderTop: isDaylight
-                    ? "1px solid rgba(0,0,0,0.08)"
-                    : "1px solid rgba(255,255,255,0.12)",
+                    ? "1px solid rgba(255,255,255,0.32)"
+                    : "1px solid rgba(255,255,255,0.22)",
                   borderBottom: isDaylight
-                    ? "1px solid rgba(0,0,0,0.08)"
-                    : "1px solid rgba(255,255,255,0.12)",
-                  outline: "1px solid rgba(40,40,40,0.2)",
+                    ? "1px solid rgba(255,255,255,0.32)"
+                    : "1px solid rgba(255,255,255,0.22)",
+                  outline: "none",
                   boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
                   ...headerFadeStyle,
                 }}
@@ -687,10 +687,10 @@ export const Grid3D: React.FC<Grid3DProps> = (props) => {
                                 aria-hidden="true"
                                 className="absolute -inset-1 rounded-full"
                                 style={{
-                                    backgroundColor: isDaylight ? 'rgba(255,255,255,0.42)' : 'rgba(0, 0, 0, 0.42)',
-                                    borderTop: isDaylight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.12)',
-                                    borderBottom: isDaylight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.12)',
-                                    outline: '1px solid rgba(40,40,40,0.2)',
+                                    backgroundColor: isDaylight ? 'rgba(255,255,255,0.22)' : 'rgba(0, 0, 0, 0.42)',
+                                    borderTop: isDaylight ? '1px solid rgba(255,255,255,0.32)' : '1px solid rgba(255,255,255,0.22)',
+                                    borderBottom: isDaylight ? '1px solid rgba(255,255,255,0.32)' : '1px solid rgba(255,255,255,0.22)',
+                                    outline: 'none',
                                     boxShadow: '2px 2px 8px 2px rgba(40,40,40,0.4)',
                                     ...headerFadeStyle,
                                 }}
@@ -704,7 +704,7 @@ export const Grid3D: React.FC<Grid3DProps> = (props) => {
                                 data-glass-blur="0.3"
                                 data-glass-bend="4"
                                 aria-hidden="true"
-                                className={`absolute top-0 bottom-0 z-10 rounded-full shadow-sm pointer-events-none transition-[background-color,box-shadow] duration-200 ease-out outline outline-1 outline-[rgba(40,40,40,0.2)] ${isDaylight ? 'border-y border-black/[0.08]' : 'border-y border-white/[0.12]'} ${thumbDragging ? 'bg-transparent z-888 shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)]' : 'bg-[var(--text-accent)]/20 shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)]'}`}
+                                className={`absolute top-0 bottom-0 z-10 rounded-full shadow-sm pointer-events-none transition-[background-color,box-shadow] duration-200 ease-out ${isDaylight ? 'border-y border-white/[0.32]' : 'border-y border-white/[0.22]'} ${thumbDragging ? 'bg-transparent z-888 shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)]' : 'bg-[var(--text-accent)]/20 shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)]'}`}
                                 style={{
                                     left: thumbLeft,
                                     width: thumbWidth,
@@ -785,15 +785,15 @@ export const Grid3D: React.FC<Grid3DProps> = (props) => {
                         data-glass-light
                         style={{
                             backgroundColor: isDaylight
-                            ? "rgba(255,255,255,0.42)"
+                            ? "rgba(255,255,255,0.22)"
                             : "rgba(0, 0, 0, 0.42)",
                             borderTop: isDaylight
-                            ? "1px solid rgba(0,0,0,0.08)"
-                            : "1px solid rgba(255,255,255,0.12)",
+                            ? "1px solid rgba(255,255,255,0.32)"
+                            : "1px solid rgba(255,255,255,0.22)",
                             borderBottom: isDaylight
-                            ? "1px solid rgba(0,0,0,0.08)"
-                            : "1px solid rgba(255,255,255,0.12)",
-                            outline: "1px solid rgba(40,40,40,0.2)",
+                            ? "1px solid rgba(255,255,255,0.32)"
+                            : "1px solid rgba(255,255,255,0.22)",
+                            outline: "none",
                             boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4)",
                             color: isDaylight ? "#000" : "#fff",
                             overflow: "auto",

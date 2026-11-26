@@ -62,7 +62,7 @@
     overflow: hidden;
     border-top: rgb(255 255 255 / 40%) 1px solid;
     border-bottom: rgb(255 255 255 / 40%) 1px solid;
-    outline: 1px solid rgba(40,40,40,0.2);
+    outline: none;
     border-radius: 24px;
     background: rgb(0 0 0 / 40%);
     box-shadow: 0 24px 64px rgb(0 0 0 / 42%);

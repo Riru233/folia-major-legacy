@@ -76,12 +76,12 @@ const CommandPaletteInlineFrame: React.FC<CommandPaletteInlineFrameProps> = ({
                 ? "rgba(255,255,255,0.4)"
                 : "rgba(0,0,0,0.4)",
               borderTop: isDaylight
-                ? "1px solid rgba(0,0,0,0.08)"
-                : "1px solid rgba(255,255,255,0.12)",
+                ? "1px solid rgba(255,255,255,0.32)"
+                : "1px solid rgba(255,255,255,0.22)",
               borderBottom: isDaylight
-                ? "1px solid rgba(0,0,0,0.08)"
-                : "1px solid rgba(255,255,255,0.12)",
-              outline: "1px solid rgba(40,40,40,0.2)",
+                ? "1px solid rgba(255,255,255,0.32)"
+                : "1px solid rgba(255,255,255,0.22)",
+              outline: "none",
               boxShadow: "2px 2px 8px 2px rgba(40,40,40,0.4),inset 0px -4px 8px rgba(40,40,40,0.4)",
             }}
           >

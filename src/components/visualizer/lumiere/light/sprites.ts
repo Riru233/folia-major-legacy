@@ -33,7 +33,7 @@ const drawDot = (size: number) => {
     const gradient = context.createRadialGradient(r, r, 0, r, r, r);
     gradient.addColorStop(0, 'rgba(255,255,255,1)');
     gradient.addColorStop(0.18, 'rgba(255,255,255,0.72)');
-    gradient.addColorStop(0.45, 'rgba(255,255,255,0.2)');
+    gradient.addColorStop(0.45, 'rgba(255,255,255,0.32)');
     gradient.addColorStop(1, 'rgba(255,255,255,0)');
     context.fillStyle = gradient;
     context.fillRect(0, 0, size, size);
@@ -78,7 +78,7 @@ const drawBokeh = (size: number) => {
     const r = size / 2;
     const gradient = context.createRadialGradient(r, r, 0, r, r, r * 0.96);
     gradient.addColorStop(0, 'rgba(255,255,255,0.35)');
-    gradient.addColorStop(0.78, 'rgba(255,255,255,0.42)');
+    gradient.addColorStop(0.78, 'rgba(255,255,255,0.22)');
     gradient.addColorStop(0.9, 'rgba(255,255,255,0.75)');
     gradient.addColorStop(1, 'rgba(255,255,255,0)');
     context.fillStyle = gradient;

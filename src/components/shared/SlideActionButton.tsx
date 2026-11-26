@@ -281,12 +281,12 @@ export const SlideActionButton: React.FC<SlideActionButtonProps> = ({
             ? "rgba(255,255,255,0.4)"
             : "rgba(0,0,0,0.4)",
           borderTop: isDaylight
-            ? "1px solid rgba(0,0,0,0.08)"
-            : "1px solid rgba(255,255,255,0.12)",
+            ? "1px solid rgba(255,255,255,0.32)"
+            : "1px solid rgba(255,255,255,0.22)",
           borderBottom: isDaylight
-            ? "1px solid rgba(0,0,0,0.08)"
-            : "1px solid rgba(255,255,255,0.12)",
-          outline: "1px solid rgba(40,40,40,0.2)",
+            ? "1px solid rgba(255,255,255,0.32)"
+            : "1px solid rgba(255,255,255,0.22)",
+          outline: "none",
         }}
         className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg transform absolute right-0 top-0 z-10 disabled:opacity-40 disabled:cursor-default ${isDaylight ? "bg-white/70 text-zinc-900" : "bg-black/40 text-white"}`}
         title={title}

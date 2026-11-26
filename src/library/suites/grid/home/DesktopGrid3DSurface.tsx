@@ -193,7 +193,7 @@ export const DesktopGrid3DSurface: React.FC<DesktopGrid3DSurfaceProps> = ({
                                         onClick={action.onClick}
                                         disabled={action.disabled}
                                         title={action.title}
-                    className={`flex h-7 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${isDaylight ? "border-y border-black/[0.08] bg-[#fff4]" : "border-y border-white/[0.12] bg-[#0004]"} outline outline-1 outline-[rgba(40,40,40,0.2)] shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)]  ${
+                    className={`flex h-7 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${isDaylight ? "border-y border-white/[0.32] bg-[#fff4]" : "border-y border-white/[0.22] bg-[#0004]"} shadow-[2px_2px_8px_2px_rgba(40,40,40,0.4)]  ${
                       action.active ? chrome.strongText : chrome.softText
                     }`}
                                     >
